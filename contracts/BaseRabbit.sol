@@ -133,6 +133,6 @@ contract BaseRabbit  is Ownable {
     mapping (uint32 => address) public rabbitToOwner; 
     mapping(address => uint32[]) public ownerBunnies;
     //mapping (address => uint) ownerRabbitCount;
-    mapping (uint32 => string) public rabbitDescription;
-    mapping (uint32 => string) public rabbitName; 
+    mapping (uint32 => string) rabbitDescription;
+    mapping (uint32 => string) rabbitName; 
 }

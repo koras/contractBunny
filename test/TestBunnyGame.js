@@ -204,5 +204,19 @@ it("Устанавливаем стоимость для кролика ("+SireB
       }); 
 
     
+      it("Дадим описание первому кролику ", function() {
+        var description = 'Мой первый любимый и самый лучший кролик на свете';
+        return meta.setDescriptionRabbit(1, description, {from: accounts[0], gas:GasCost,gasPrice: gasPrice_value}).then(function(instance) {
+          return meta.getDescriptionRabbit.call(1);
+          }).then( (result ) => {
+             assert.equal(result ,description, 'Подарок не соответстует тому которому подарили : ' + result); 
+          })
+      }); 
+
+
+
+
+      // setDescriptionRabbit(uint32 rabbitid, string description) 
+      //setNameRabbit(uint32 rabbitid, string name)      
 
 });

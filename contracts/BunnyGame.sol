@@ -113,7 +113,7 @@ contract BunnyGame is RabbitMarket {
     /**
      *  Устанавливаем кулдаун на роды
      */
-    function coolduwnUP(uint32 _mother) public { // internal
+    function coolduwnUP(uint32 _mother) internal { 
         require(isPauseSave());
         rabbits[(_mother-1)].birthCount++;
         rabbits[(_mother-1)].birthLastTime = now;
@@ -166,6 +166,10 @@ contract BunnyGame is RabbitMarket {
             rabbitDescription[rabbitid] = description;
         }
     } 
+     
+    function getDescriptionRabbit(uint32 _rabbitid) public returns(string) {
+        return rabbitDescription[_rabbitid];
+    } 
     
     /**
     *  @dev give the name and description for the rabbit
@@ -177,6 +181,9 @@ contract BunnyGame is RabbitMarket {
         if (bytes(name).length < 256 && bytes(name).length > 0) {
             rabbitName[rabbitid] = name;
         }
+    } 
+    function getNameRabbit(uint32 rabbitid) public returns(string) {
+        return rabbitName[rabbitid];
     } 
 
     function getMoney(uint _value) public onlyOwner {
