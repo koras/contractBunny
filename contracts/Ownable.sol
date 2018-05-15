@@ -65,23 +65,24 @@ contract Ownable {
         }
     } 
      
-    function transferOwnerMoney( address _ownerMoney) public  onlyOwner {
+    function transferOwnerMoney(address _ownerMoney) public  onlyOwner {
         ownerMoney = _ownerMoney;
     }
+
+
+
+
 
     
     function getOwnerMoney() public view onlyOwner returns(address) {
         return ownerMoney;
     }
-
     function getOwnerTech() public view onlyOwner returns(address) {
         return ownerTech;
     }
-
     function getOwnerServer() public view onlyOwner returns(address) {
         return ownerServer;
     }
-
     function getPrivAddress() public view onlyOwner returns(address) {
         return privAddress;
     }

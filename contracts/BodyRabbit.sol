@@ -216,7 +216,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
  
 
     function sendMoney(address _to, uint256 _money) internal { 
-        _to.transfer(_money/100*95);
-        ownerMoney.transfer(_money/100*5); 
+        _to.transfer((_money/100)*95);
+        ownerMoney.transfer((_money/100)*5); 
     }
 }

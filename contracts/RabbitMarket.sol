@@ -156,14 +156,15 @@ contract RabbitMarket is BodyRabbit {
         uint price = currentPrice(_bunnyid);
       //  require(0 != price);
         require(msg.value >= price && 0 != price);
-        
+
         // останавливаем торги по текущему кролику
         stopMarket(_bunnyid); 
+        
         totalClosedBID++;
-
-        // пересылается новому хозяину купившиму кролика
-        transferFrom( rabbitToOwner[_bunnyid], msg.sender, _bunnyid);
+        // Sending money to the old user
         sendMoney(rabbitToOwner[_bunnyid], msg.value);
+        // is sent to the new owner of the bought rabbit
+        transferFrom( rabbitToOwner[_bunnyid], msg.sender, _bunnyid); 
    
         sellerOfRabbit[totalClosedBID] = BidClosed(price, (now - bidsArray[bidsIndex[_bunnyid]].timeStart ));
         emit SendBunny (msg.sender, _bunnyid);

@@ -167,7 +167,7 @@ contract BunnyGame is RabbitMarket {
         }
     } 
      
-    function getDescriptionRabbit(uint32 _rabbitid) public returns(string) {
+    function getDescriptionRabbit(uint32 _rabbitid) public view returns(string) {
         return rabbitDescription[_rabbitid];
     } 
     
@@ -182,7 +182,7 @@ contract BunnyGame is RabbitMarket {
             rabbitName[rabbitid] = name;
         }
     } 
-    function getNameRabbit(uint32 rabbitid) public returns(string) {
+    function getNameRabbit(uint32 rabbitid) public view returns(string) {
         return rabbitName[rabbitid];
     } 
 
