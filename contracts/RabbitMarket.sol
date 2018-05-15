@@ -168,13 +168,8 @@ contract RabbitMarket is BodyRabbit {
         sellerOfRabbit[totalClosedBID] = BidClosed(price, (now - bidsArray[bidsIndex[_bunnyid]].timeStart ));
         emit SendBunny (msg.sender, _bunnyid);
     }
-
-
-
-
-
-
-
+ 
+ 
 
     /**
     * @dev removal from the market rabbit

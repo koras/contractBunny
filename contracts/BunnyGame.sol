@@ -80,6 +80,7 @@ contract BunnyGame is RabbitMarket {
 
         rabbitToOwner[_sire].transfer(_sirePrice);
         
+        coolduwnUP(_matron);
         // передаём кролика новому обладателю
         transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk);   
           
@@ -94,12 +95,18 @@ contract BunnyGame is RabbitMarket {
     /**
      *  получаем cooldown
      */
-    function getcoolduwn(uint32 _mother) public view returns(uint lastTime, uint cd) {
+    function getcoolduwn(uint32 _mother) public view returns(uint lastTime, uint cd, uint lefttime) {
         cd = rabbits[(_mother-1)].birthCount;
         if(cd > 14) {
             cd = 14;
         }
+        // время когда я могу рожать
         lastTime = (cooldowns[cd] + rabbits[(_mother-1)].birthLastTime);
+        if(lastTime > now)
+        {
+            // не могу рожать, осталось до родов 
+            lefttime = lastTime - now;
+        }
     }
 
 

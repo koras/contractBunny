@@ -48,11 +48,10 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     function setPriv(address _privAddress) public returns(bool) {
         privAddress = _privAddress;
         privateContract = PrivateRabbitInterface(_privAddress);
-    }
-//address constant public  myAddr = 0x82c2601df5171c09979a26779018e029b0df5f45;
+    } 
     bool public fcontr = false;
 
-    address public  myAddr_test = 0x8d6086910c66465Be6AA2dBA55a51f13734270fC;
+    address public  myAddr_test = 0x2F2DD44C22747932A8741aFD53A852519c083FC7;
     constructor() public {
 
       // address myAddr = 0x82c2601dF5171c09979A26779018e029B0df5f45;
