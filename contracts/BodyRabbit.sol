@@ -51,11 +51,8 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     } 
     bool public fcontr = false;
 
-    address public  myAddr_test = 0x2F2DD44C22747932A8741aFD53A852519c083FC7;
-    constructor() public {
-
-      // address myAddr = 0x82c2601dF5171c09979A26779018e029B0df5f45;
-      //  setPriv(myAddr); 
+    address public  myAddr_test = 0x4478f980DEB6a3DeF9BFbb519E085DCc96aaDFd0;
+    constructor() public { 
         setPriv(myAddr_test);
         fcontr = true;
     }
@@ -101,6 +98,12 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         }
     }
 
+
+ 
+    function getSirePrice(uint32 _tokenId) public view returns(uint) {
+        uint res =   (rabbitSirePrice[_tokenId] / 100);
+        return res.mul(25);
+    }
  
     function addTokenList(address owner,  uint32 _tokenId) internal {
         ownerBunnies[owner].push( _tokenId);
@@ -158,9 +161,10 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     }
 
 
-    function getTokenList(address owner) public view returns(uint32[]) {
-        return ownerBunnies[owner];
-    }
+    function getTokenOwner(address owner) public view returns(uint total, uint32[] list) {
+        total = ownerBunnies[owner].length;
+        list = ownerBunnies[owner];
+    } 
 
     
     function setRabbitMother(uint32 children, uint32 mother) internal { 

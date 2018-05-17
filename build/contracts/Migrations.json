@@ -11,14 +11,14 @@
     "absolutePath": "/home/koras/contracts/publicRabbit/pub/contracts/Migrations.sol",
     "exportedSymbols": {
       "Migrations": [
-        1636
+        1861
       ]
     },
-    "id": 1637,
+    "id": 1862,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1635,
+        "id": 1860,
         "literals": [
           "solidity",
           "^",
@@ -34,14 +34,14 @@
         "contractKind": "contract",
         "documentation": "\n",
         "fullyImplemented": true,
-        "id": 1636,
+        "id": 1861,
         "linearizedBaseContracts": [
-          1636
+          1861
         ],
         "name": "Migrations",
         "nodeType": "ContractDefinition",
         "nodes": [],
-        "scope": 1637,
+        "scope": 1862,
         "src": "68:36:3"
       }
     ],
@@ -51,14 +51,14 @@
     "absolutePath": "/home/koras/contracts/publicRabbit/pub/contracts/Migrations.sol",
     "exportedSymbols": {
       "Migrations": [
-        1636
+        1861
       ]
     },
-    "id": 1637,
+    "id": 1862,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1635,
+        "id": 1860,
         "literals": [
           "solidity",
           "^",
@@ -74,14 +74,14 @@
         "contractKind": "contract",
         "documentation": "\n",
         "fullyImplemented": true,
-        "id": 1636,
+        "id": 1861,
         "linearizedBaseContracts": [
-          1636
+          1861
         ],
         "name": "Migrations",
         "nodeType": "ContractDefinition",
         "nodes": [],
-        "scope": 1637,
+        "scope": 1862,
         "src": "68:36:3"
       }
     ],
@@ -93,5 +93,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-05-14T16:31:27.591Z"
+  "updatedAt": "2018-05-16T20:58:19.334Z"
 }

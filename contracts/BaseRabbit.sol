@@ -11,8 +11,11 @@ import "./Ownable.sol";
 library SafeMath {
     
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a * b;
-        assert(a == 0 || c / a == b);
+        if (a == 0) {
+            return 0;
+        }
+        uint c = a * b;
+        assert(c / a == b);
         return c;
     }
 
@@ -40,9 +43,7 @@ library SafeMath {
 contract BaseRabbit  is Ownable {
        
     using SafeMath for uint256;
-    
     bool pauseSave = false;
-    
     uint256 bigPrice = 0.0001 ether;
      
     // ID the last seal
@@ -56,7 +57,7 @@ contract BaseRabbit  is Ownable {
     uint public timeRangeCreateGen0 = 1;
 
     uint public promoGen0 = 2500;
-    uint public promoMoney = 1000000000;
+    uint public promoMoney = 1*bigPrice;
 
 
     function setPromoGen0(uint _promoGen0) public onlyOwner {
@@ -75,15 +76,14 @@ contract BaseRabbit  is Ownable {
     } 
 
     mapping(uint32 => uint) public totalSalaryBunny;
-
     // reward chain 
     mapping(uint32 => uint32[]) public rabbitMother;
-    
 
 
-
+    mapping(uint32 => uint) rabbitSirePrice;
+    mapping(uint => uint32[]) public sireGenom;
  
-    mapping(uint32 => uint) public rabbitRole; 
+  //  mapping(uint32 => uint) public rabbitRole; 
 
 
 
@@ -112,20 +112,23 @@ contract BaseRabbit  is Ownable {
     struct Rabbit { 
          // родители
         uint32 mother;
-        uint32 sire;
-        //indexGenome   
+        uint32 sire; 
+         
         // блок в котором родился кролик
         uint birthblock;
-         // количество родов
+         // количество родов или сколько раз было потомство
         uint birthCount;
          // Время когда последний раз рожал Кролик
         uint birthLastTime;
+        // текущая роль кролика
+        uint role;
+        //indexGenome   
+        uint genome;
     }
     /**
     * Там где будем хранить информацию о кроликах
     */
     Rabbit[]  public rabbits;
-     
      
     /**
     * кому принадлежит кролик

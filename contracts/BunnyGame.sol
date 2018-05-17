@@ -26,14 +26,12 @@ contract BunnyGame is RabbitMarket {
         require(isPriv());
         require(isPauseSave());
         uint  localdnk = privateContract.getNewRabbit();
-        Rabbit memory _Rabbit =  Rabbit(0, 0, block.number, 0, 0);
+        Rabbit memory _Rabbit =  Rabbit(0, 0, block.number, 0, 0, 0, 0);
         uint32 bunnyid =  uint32(rabbits.push(_Rabbit));
         mapDNK[bunnyid] = localdnk;
         
-        transferNewBunny(ownerMoney, bunnyid, localdnk);   
-
+        transferNewBunny(msg.sender, bunnyid, localdnk);   
         uint _money = getpricegen0();
-
         setMarket(bunnyid, _money);
           
         lastTimeGen0 = now;
@@ -54,26 +52,32 @@ contract BunnyGame is RabbitMarket {
         require(isPauseSave());
         require(rabbitToOwner[_matron] == msg.sender);
         // Checking for the role
-        require(rabbitRole[_sire] == 1);
+        require(rabbits[_sire].role == 1);
         require(_matron != _sire);
 
+        uint genome = 0;
         uint lastTime;
         (lastTime,) = getcoolduwn(_matron);
         require(now >= lastTime);
 
         // Checking the money
+
         uint _sirePrice = rabbitSirePrice[_sire];
-        uint _moneyMother = _sirePrice/4;
-        uint _finalCost = _moneyMother + _sirePrice;
-        require(msg.value >= _finalCost);
+        uint _moneyMother = _sirePrice.div(4);
+    //    uint _finalCost = _moneyMother + _sirePrice;
+        require(msg.value >= (_moneyMother + _sirePrice));
           
-        // create 
-        uint elementmatron = mapDNK[_matron];
-        uint elementsire = mapDNK[_sire];
         
-        uint localdnk =  privateContract.mixDNK(elementmatron, elementsire);
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0);
-        
+        uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
+
+        if (rabbits[_matron].genome >= rabbits[_sire].genome) {
+            genome = rabbits[_matron].genome.add(1);
+        } else {
+            genome = rabbits[_sire].genome.add(1);
+        }
+
+        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome);
+
         uint32 bunnyid =  uint32(rabbits.push(rabbit));
         mapDNK[bunnyid] = localdnk;
         _transferMoneyMother(_matron, _moneyMother);
@@ -102,10 +106,9 @@ contract BunnyGame is RabbitMarket {
         }
         // время когда я могу рожать
         lastTime = (cooldowns[cd] + rabbits[(_mother-1)].birthLastTime);
-        if(lastTime > now)
-        {
+        if(lastTime > now) {
             // не могу рожать, осталось до родов 
-            lefttime = lastTime - now;
+            lefttime = lastTime.sub(now);
         }
     }
 
@@ -115,7 +118,7 @@ contract BunnyGame is RabbitMarket {
      */
     function coolduwnUP(uint32 _mother) internal { 
         require(isPauseSave());
-        rabbits[(_mother-1)].birthCount++;
+        rabbits[(_mother-1)].birthCount = rabbits[(_mother-1)].birthCount.add(1);
         rabbits[(_mother-1)].birthLastTime = now;
     }
 
@@ -126,11 +129,10 @@ contract BunnyGame is RabbitMarket {
      */
     function _transferMoneyMother(uint32 _mother, uint _valueMoney) internal {
         require(isPauseSave());
+        require(_valueMoney > 0);
         if (rabbitMother[_mother].length > 0) {
             uint pastMoney = _valueMoney/uint(rabbitMother[_mother].length);
             for (uint i=0; i < rabbitMother[_mother].length; i++) {
-
-
                 uint32 _parrentMother = rabbitMother[_mother][i];
                 address add = rabbitToOwner[_parrentMother];
                 // платим зарплату
@@ -149,11 +151,64 @@ contract BunnyGame is RabbitMarket {
     function setRabbitSirePrice(uint32 _rabbitid, uint price) public returns(bool) {
         require(isPauseSave());
         require(rabbitToOwner[_rabbitid] == msg.sender);
-        rabbitRole[_rabbitid] = 1;
-        rabbitSirePrice[_rabbitid] = (price * bigPrice);
+        require(price > bigPrice);
+
+        uint lastTime;
+        (lastTime,) = getcoolduwn(_rabbitid);
+        require(now >= lastTime);
+
+        if (rabbits[_rabbitid].role == 1 && rabbitSirePrice[_rabbitid] == price) {
+            return false;
+        }
+
+        rabbits[_rabbitid].role = 1;
+        rabbitSirePrice[_rabbitid] = price;
+        uint gen = rabbits[_rabbitid].genome;
+
+        sireGenom[gen].push(_rabbitid);
         return true;
     }
  
+    /**
+    * @dev We set the cost of renting our genes
+     */
+    function setSireStop(uint32 _rabbitid) public returns(bool) {
+        require(isPauseSave());
+        require(rabbitToOwner[_rabbitid] == msg.sender);
+        require(rabbits[_rabbitid].role == 0);
+
+        rabbits[_rabbitid].role = 0;
+        rabbitSirePrice[_rabbitid] = 0;
+
+        deleteSire(_rabbitid);
+        return true;
+    }
+
+
+
+     function deleteSire(uint32 _tokenId) internal { 
+        uint gen = rabbits[_tokenId].genome;
+
+        uint count = sireGenom[gen].length;
+     //   if(0 == count) {
+      //      return;
+      //  }
+        for (uint i = 0; i < count; i++) {
+            if(sireGenom[gen][i] == _tokenId)
+            { 
+                delete sireGenom[gen][i];
+                if(count > 0 && count != (i-1)){
+                    sireGenom[gen][i] = sireGenom[gen][(count-1)];
+                    delete sireGenom[gen][(count-1)];
+                } 
+                sireGenom[gen].length--;
+                return;
+            } 
+        }
+    }
+
+
+
     
     /**
     *  @dev give the name and description for the rabbit
@@ -190,44 +245,8 @@ contract BunnyGame is RabbitMarket {
         require(address(this).balance >= _value);
         ownerMoney.transfer(_value);
     }
-
-
-
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////
-
-    function wStartTest() public onlyOwner {
-        createGennezise();//1
-        createGennezise();//2
-        createGennezise();//3
-        createGennezise();//4
-        createGennezise();//5
-        createGennezise();//6
-        createGennezise();//7
-        createGennezise();//8
-        createGennezise();//9
-        createGennezise();//10
-        createGennezise();//11
-        createGennezise();//12
-        createGennezise();//13
-        createGennezise();//14
-         
-    }
-    function wGiffTest() public onlyOwner {
-       giff(uint32(2) ,0x82c2601dF5171c09979A26779018e029B0df5f45);
-       giff(uint32(3) ,0x82c2601dF5171c09979A26779018e029B0df5f45);
-    }
-
-
-
-     
+ 
+ 
 }
 
 

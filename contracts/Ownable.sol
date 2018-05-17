@@ -7,10 +7,10 @@ pragma solidity ^0.4.23;
 contract Ownable {
 
     address public ownerCEO;
-    address public ownerMoney; 
-    address public ownerTech;
-    address public ownerServer;
-    address public privAddress;
+    address ownerMoney; 
+    address ownerTech;
+    address ownerServer;
+    address privAddress;
 
 
     /**
@@ -21,7 +21,6 @@ contract Ownable {
     constructor() public {
        // address my = 0x1e4147cC0a8d70fa299868C4725201244F4aA818;
         address my =  msg.sender;
-
         ownerCEO = my;
         ownerTech = my;
         ownerServer = my;
@@ -66,7 +65,8 @@ contract Ownable {
     } 
      
     function transferOwnerMoney(address _ownerMoney) public  onlyOwner {
-        ownerMoney = _ownerMoney;
+ 
+        ownerMoney = address(_ownerMoney);
     }
 
 
