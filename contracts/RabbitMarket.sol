@@ -103,7 +103,6 @@ contract RabbitMarket is BodyRabbit {
         uint  timeStart;
     }
     mapping(uint=>Bids) public bidsArray;
-
     mapping(uint32 => uint) bidsIndex;
  
    // mapping (address => uint) sellerOfRabbit;
@@ -111,7 +110,34 @@ contract RabbitMarket is BodyRabbit {
      /*** 
     */
   
-    function setMarket(uint32 _bunnyid, uint _money) public returns (uint) {
+
+     // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
+    function stopMarket(uint32 _bunnyID) public returns(uint) {
+        require(isPauseSave());
+        // require(rabbitToOwner[_bunnyID] == msg.sender); //dev
+        for (uint i = 0; i <= marketCount; i++) {
+            if (bidsArray[i].rabbitID == _bunnyID) {
+
+                uint indexOld = bidsIndex[_bunnyID];
+
+                delete bidsIndex[_bunnyID];
+
+                delete bidsArray[i];
+                if (marketCount > 0 && i > 0 && marketCount != (i-1)) {
+                    bidsArray[i] = bidsArray[(marketCount-1)];
+                    uint32 b = bidsArray[i].rabbitID;
+                    bidsIndex[b] = indexOld;
+                    
+
+                delete  bidsArray[(marketCount-1)];
+                }
+                return marketCount--;
+            }
+        }
+        return marketCount;
+    }
+
+    function startMarket(uint32 _bunnyid, uint _money) public returns (uint) {
         require(isPauseSave());
         require(_money >= bigPrice);
         require(rabbitToOwner[_bunnyid] ==  msg.sender);
@@ -123,9 +149,30 @@ contract RabbitMarket is BodyRabbit {
         return marketCount++; 
     }
 
- 
-    
- 
+    /**
+    * @dev get rabbit price
+    */
+    function currentPrice(uint32 _bunnyid) public view returns(uint) {
+        if(_bunnyid == 0){
+            return 0;
+        }
+        uint index = bidsIndex[_bunnyid];
+        uint timeStart = bidsArray[index].timeStart;
+        uint startMoney = bidsArray[index].startMoney;
+        uint resMoney = 0;
+        uint rangeTime = now - timeStart;
+        if(stepMoney != 0) { 
+            uint iter = rangeTime / stepMoney;
+            if(iter != 0 && startMoney != 0) {
+                uint range = startMoney / 1000;
+                resMoney = startMoney - range*10;
+             }else{
+                 resMoney = startMoney;
+             }
+        }
+        
+        return resMoney;
+    }
 
     function buyBunny(uint32 _bunnyid) public payable {
         require(isPauseSave());
@@ -155,9 +202,6 @@ contract RabbitMarket is BodyRabbit {
     function deleteRabbitMarket(uint rabbitid) public pure { 
         rabbitid; 
     } 
-
- 
-    
     /**
     * @param rabbitid rabbit in relation to whom reduce the cost
     */
@@ -166,12 +210,6 @@ contract RabbitMarket is BodyRabbit {
         rabbitid;
         step;
     }
-    
-    
- 
-     
-    
-    
     /**
     * @dev Get the cost of the zeroth gene necessary to add to the store
     */
@@ -202,9 +240,6 @@ contract RabbitMarket is BodyRabbit {
         }
         return  _money;
     } 
-
-
-
 
     function getSireList(uint page, uint indexBunny) 
             public view returns(
@@ -275,8 +310,8 @@ contract RabbitMarket is BodyRabbit {
                 }
 
                 elementTotal = marketCount;
-                uint startArray = (((page-1)*pagecount)+1);
-                for (uint i = startArray; i < (elementEnd+1); i++) {
+              //  uint startArray = (((page-1)*pagecount)+1);
+                for (uint i = (((page-1)*pagecount)+1); i < (elementEnd+1); i++) {
                     bunnyID = uint32(bidsArray[i].rabbitID);
                     rabbitID[start] = bunnyID;
                     rabbitSeller[start] = rabbitToOwner[bunnyID]; 
@@ -295,16 +330,19 @@ contract RabbitMarket is BodyRabbit {
     */
     function giff(uint32 bunnyid, address add) public {
         require(rabbitToOwner[bunnyid] == msg.sender);
+        // a rabbit taken for free can not be given
+        require(!(giffblock[bunnyid]));
         transferFrom(msg.sender, add, bunnyid);
     }
 
-
     function getTokenList(uint page, address owner) public view returns(
+   
                 uint32[12] bunnys, 
                 uint[12] bunnyBreed, 
                 uint[12] bunnyRole,
-                uint[12] sirePrice,
+              //  uint[12] sirePrice,
                 uint[12] bunnyMarketPrice,
+                uint[12] ids, 
                 uint elementEnd,
                 uint elementTotal,
                 uint startArray
@@ -335,74 +373,19 @@ contract RabbitMarket is BodyRabbit {
                     _bunnyID = ownerBunnies[owner][(i-1)];
                    // bunnys[start] = _bunnyID;
 
-
                     if(_bunnyID != 0) {  
-                      bunnys[start] = _bunnyID;
-                    bunnyBreed[start] = rabbits[(_bunnyID-1)].genome; 
-                    bunnyRole[start] = rabbits[(_bunnyID-1)].role;
-                    sirePrice[start] = getSirePrice(_bunnyID); 
-                    bunnyMarketPrice[start] = currentPrice(_bunnyID);
+                        bunnys[start] = _bunnyID; 
+                        bunnyBreed[start] = rabbits[(_bunnyID-1)].genome; 
+                        bunnyRole[start] = rabbits[(_bunnyID-1)].role;
+                    //    sirePrice[start] = getSirePrice(_bunnyID); 
+                        bunnyMarketPrice[start] = currentPrice(_bunnyID);
+                        ids[start] = rabbits[(_bunnyID-1)].id;
                     }
                     start++;
                 }
 
       //  return ownerBunnies[owner].length;
     }
-
-
-
-    /**
-    * @dev get rabbit price
-    */
-    function currentPrice(uint32 bunnyid) public view returns(uint) {
-        uint index = bidsIndex[bunnyid];
-        uint timeStart = bidsArray[index].timeStart;
-        uint startMoney = bidsArray[index].startMoney;
-        uint resMoney = 0;
-        uint rangeTime = now - timeStart;
-        if(stepMoney != 0) { 
-            uint iter = rangeTime / stepMoney;
-            if(iter != 0 && startMoney != 0) {
-                uint range = startMoney / 1000;
-                resMoney = startMoney - range*10;
-             }else{
-                 resMoney = startMoney;
-             }
-        }
-        return resMoney;
-    }
-    
-
-
-
-
-     // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
-    function stopMarket(uint32 _bunnyID) public returns(uint) {
-        require(isPauseSave());
-        // require(rabbitToOwner[_bunnyID] == msg.sender); //dev
-        for (uint i = 0; i <= marketCount; i++) {
-            if (bidsArray[i].rabbitID == _bunnyID) {
-
-                uint indexOld = bidsIndex[_bunnyID];
-
-                delete bidsIndex[_bunnyID];
-
-                delete bidsArray[i];
-                if (marketCount > 0 && i > 0 && marketCount != (i-1)) {
-                    bidsArray[i] = bidsArray[(marketCount-1)];
-                    uint32 b = bidsArray[i].rabbitID;
-                    bidsIndex[b] = indexOld;
-                    
-
-                delete  bidsArray[(marketCount-1)];
-                }
-                return marketCount--;
-            }
-        }
-        return marketCount;
-    }
-    
-
     function getMarketCount() public view returns(uint) {
         return marketCount;
     }

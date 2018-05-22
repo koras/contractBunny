@@ -67,27 +67,14 @@ contract BaseRabbit  is Ownable {
     function setPromoMoney(uint _promoMoney) public onlyOwner {
         promoMoney = _promoMoney;
     }
-
-
-
     modifier timeRange() {
         require((lastTimeGen0+timeRangeCreateGen0) < now);
         _;
     } 
-
     mapping(uint32 => uint) public totalSalaryBunny;
-    // reward chain 
     mapping(uint32 => uint32[]) public rabbitMother;
-
-
     mapping(uint32 => uint) rabbitSirePrice;
     mapping(uint => uint32[]) public sireGenom;
- 
-  //  mapping(uint32 => uint) public rabbitRole; 
-
-
-
-    
     mapping (uint32 => uint) mapDNK;
    
     uint32[15] public cooldowns = [
@@ -111,9 +98,9 @@ contract BaseRabbit  is Ownable {
 
     struct Rabbit { 
          // родители
+        uint id;
         uint32 mother;
         uint32 sire; 
-         
         // блок в котором родился кролик
         uint birthblock;
          // количество родов или сколько раз было потомство
@@ -138,4 +125,9 @@ contract BaseRabbit  is Ownable {
     //mapping (address => uint) ownerRabbitCount;
     mapping (uint32 => string) rabbitDescription;
     mapping (uint32 => string) rabbitName; 
+
+    //giff 
+    mapping (uint32 => bool) giffblock; 
+    mapping (address => bool) ownerGennezise;
+
 }

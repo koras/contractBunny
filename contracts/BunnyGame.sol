@@ -8,11 +8,7 @@ import "./RabbitMarket.sol";
 contract BunnyGame is RabbitMarket {    
  
     event NewBunny(uint32 bunnyid, uint dnk, uint256 blocknumber );
-        /***
-        * @dev create a new gene and put it up for sale, this operation takes place on the server
-         */
-
-
+  
     function transferNewBunny(address _to, uint32 _bunnyid, uint localdnk) internal {
         emit NewBunny(_bunnyid, localdnk, block.number);
         //rabbitToOwner[_bunnyid] = _to; 
@@ -20,29 +16,49 @@ contract BunnyGame is RabbitMarket {
         totalSalaryBunny[_bunnyid] = 0;
         totalBunny++;
     }
-    
-    
-    function createGennezise() public  onlyServer returns(uint32) {
+
+    /***
+    * @dev create a new gene and put it up for sale, this operation takes place on the server
+    */
+    function createGennezise() public {
+        bool promo = false;
         require(isPriv());
         require(isPauseSave());
+        if (totalGen0 > promoGen0) { 
+            require(msg.sender == ownerServer || msg.sender == ownerCEO);
+        }else{
+            if (!(msg.sender == ownerServer || msg.sender == ownerCEO)) {
+                require(!ownerGennezise[msg.sender]);
+                ownerGennezise[msg.sender] = true;
+                promo = true;
+            }
+        }
+        
         uint  localdnk = privateContract.getNewRabbit();
-        Rabbit memory _Rabbit =  Rabbit(0, 0, block.number, 0, 0, 0, 0);
+        Rabbit memory _Rabbit =  Rabbit(0, 0, 0, block.number, 0, 0, 0, 0);
         uint32 bunnyid =  uint32(rabbits.push(_Rabbit));
         mapDNK[bunnyid] = localdnk;
+       
+        transferNewBunny(msg.sender, bunnyid, localdnk);  
+  
+        if (promo) { 
+            uint _money = getpricegen0();
+            startMarket(bunnyid, _money);
+        }
         
-        transferNewBunny(msg.sender, bunnyid, localdnk);   
-        uint _money = getpricegen0();
-        setMarket(bunnyid, _money);
-          
+        rabbits[(bunnyid-1)].id = bunnyid;
+
         lastTimeGen0 = now;
         lastIdGen0 = bunnyid; 
-        totalGen0++;
-        return bunnyid;
+        totalGen0++; 
+
+        if (promo) {
+            giffblock[bunnyid] = true;
+        }
+        //mapping (uint32 => bool) public giffblock; 
+        //mapping (address => bool) public ownerGennezise;
     }
-   
-   
-  
-   
+    
     /**
     * @dev create new children
     */
@@ -52,7 +68,7 @@ contract BunnyGame is RabbitMarket {
         require(isPauseSave());
         require(rabbitToOwner[_matron] == msg.sender);
         // Checking for the role
-        require(rabbits[_sire].role == 1);
+        require(rabbits[(_sire-1)].role == 1);
         require(_matron != _sire);
 
         uint genome = 0;
@@ -70,13 +86,13 @@ contract BunnyGame is RabbitMarket {
         
         uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
 
-        if (rabbits[_matron].genome >= rabbits[_sire].genome) {
-            genome = rabbits[_matron].genome.add(1);
+        if (rabbits[_matron].genome >= rabbits[(_sire-1)].genome) {
+            genome = rabbits[(_matron-1)].genome.add(1);
         } else {
-            genome = rabbits[_sire].genome.add(1);
+            genome = rabbits[(_sire-1)].genome.add(1);
         }
 
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome);
+        Rabbit memory rabbit =  Rabbit(0,_matron, _sire, block.number, 0, 0, 0, genome);
 
         uint32 bunnyid =  uint32(rabbits.push(rabbit));
         mapDNK[bunnyid] = localdnk;
@@ -157,13 +173,13 @@ contract BunnyGame is RabbitMarket {
         (lastTime,) = getcoolduwn(_rabbitid);
         require(now >= lastTime);
 
-        if (rabbits[_rabbitid].role == 1 && rabbitSirePrice[_rabbitid] == price) {
+        if (rabbits[(_rabbitid-1)].role == 1 && rabbitSirePrice[_rabbitid] == price) {
             return false;
         }
 
-        rabbits[_rabbitid].role = 1;
+        rabbits[(_rabbitid-1)].role = 1;
         rabbitSirePrice[_rabbitid] = price;
-        uint gen = rabbits[_rabbitid].genome;
+        uint gen = rabbits[(_rabbitid-1)].genome;
 
         sireGenom[gen].push(_rabbitid);
         return true;
@@ -175,9 +191,9 @@ contract BunnyGame is RabbitMarket {
     function setSireStop(uint32 _rabbitid) public returns(bool) {
         require(isPauseSave());
         require(rabbitToOwner[_rabbitid] == msg.sender);
-        require(rabbits[_rabbitid].role == 0);
+        require(rabbits[(_rabbitid-1)].role == 0);
 
-        rabbits[_rabbitid].role = 0;
+        rabbits[(_rabbitid-1)].role = 0;
         rabbitSirePrice[_rabbitid] = 0;
 
         deleteSire(_rabbitid);
@@ -187,7 +203,7 @@ contract BunnyGame is RabbitMarket {
 
 
      function deleteSire(uint32 _tokenId) internal { 
-        uint gen = rabbits[_tokenId].genome;
+        uint gen = rabbits[(_tokenId-1)].genome;
 
         uint count = sireGenom[gen].length;
      //   if(0 == count) {

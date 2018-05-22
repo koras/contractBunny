@@ -51,7 +51,8 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     } 
     bool public fcontr = false;
 
-    address public  myAddr_test = 0x4478f980DEB6a3DeF9BFbb519E085DCc96aaDFd0;
+    address public  myAddr_test = 0x11351E0507ADE7f1eD11C7eeD6057Ca4456ffDb6;
+    
     constructor() public { 
         setPriv(myAddr_test);
         fcontr = true;
@@ -217,10 +218,18 @@ contract BodyRabbit is BaseRabbit, ERC721 {
       //  _owner;
         return ownerBunnies[_owner].length;
     }
- 
 
     function sendMoney(address _to, uint256 _money) internal { 
         _to.transfer((_money/100)*95);
         ownerMoney.transfer((_money/100)*5); 
     }
+
+    function getGiffBlock(uint32 bunnyid) public returns(bool) { 
+        return giffblock[bunnyid];
+    }
+
+    function getOwnerGennezise(address _to) public returns(bool) { 
+        return ownerGennezise[_to];
+    }
+     
 }

@@ -1,5 +1,5 @@
 // http://www.chaijs.com/api/assert/
-
+// return; 
 
 // kill
 // fuser -k 8545/tcp
@@ -43,21 +43,48 @@ var web3 = new Web3(Web3.givenProvider || 'http://127.0.0.1:8545');
 //var web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider('http://127.0.0.1:8545'));
 
 
+ 
 
-
-contract('Основной публичный контракт: ', ( accounts) => {
+contract('Основной функционал контракта', ( accounts) => {
 
   let giffes = accounts[1];
-
   var oldBalance =[];
   var bunnySire =[20,21,23,25,26,27,27,28,30,16,17,18,19,31,32,33,34];
-  var bunnySirePrice =[120000000000000000,52000000000000000,27000000000000000,72000000000000000,66000000000000000,37000000000000000,37000000000000000,28000000000000000,30000000000000000,52000000000000000,
-    27000000000000000,72000000000000000,66000000000000000,37000000000000000,37000000000000000,28000000000000000,30000000000000000,52000000000000000,27000000000000000,72000000000000000,66000000000000000,37000000000000000,37000000000000000,28000000000000000,30000000000000000];
-  var bunnySireItter = 0;
- 
-  ownerMoney = accounts[5];
+  var bunnySirePrice =[
+                      120000000000000000,
+                      52000000000000000,
+                      27000000000000000,
+                      72000000000000000,
+                      66000000000000000,
+                      37000000000000000,
+                      37000000000000000,
+                      28000000000000000,
+                      30000000000000000,
+                      52000000000000000,
+                      27000000000000000,
+                      72000000000000000,
+                      66000000000000000,
+                      37000000000000000,
+                      37000000000000000,
+                      28000000000000000,
+                      30000000000000000,
+                      52000000000000000,
+                      27000000000000000,
+                      72000000000000000,
+                      66000000000000000,
+                      37000000000000000,
+                      37000000000000000,
+                      28000000000000000,
+                      30000000000000000
+                    ];
+  var bunnySireItter = 0; 
   var ItterTest = 0;
   var meta; 
+  ownerMoney = accounts[5];
+
+  function Gennezise() {
+      meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
+  }
 
   ItterTest++;
   it(ItterTest + ") Загружаем контракт "+accounts[0], function() {
@@ -92,74 +119,30 @@ contract('Основной публичный контракт: ', ( accounts) =
 
  // return;
 
+ ItterTest++;
+ it(ItterTest + ") Проверка доступности приватного контракта :", function() {
+       return  meta.isPriv().then(function(result) { 
+           assert.equal(result  ,true , 'Ошибка проверки второй страницы с getTokenOwner '+result  );  
+     })
+   }); 
+    
  
   ItterTest++;
-  it(ItterTest + ") Создаём 13 кроликов"  , function() {
+  it(ItterTest + ") Создаём кроликов"  , function() {
     
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
+      for(let i=0;i<52;i++){
+          Gennezise();
+      }
 
-    
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-    meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-
-
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
-        meta.createGennezise({from: accounts[0], gas: GasCost, gasPrice:gasPrice_value});
-        return   meta.createGennezise({from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value }).then(function(instance) {
-      return meta.totalSupply.call();
-    }).then( () => {
-       assert.isTrue(true); 
+        return   meta.createGennezise({from: accounts[0], gas:  GasCost, gasPrice:gasPrice_value }).then(function(error,result) {
+            return meta.totalSupply.call();
+        }).then( (result) => {
+     //  assert.isTrue(true); 
+       assert.equal(result  ,53 , 'Ошибка Добавления кроликов '+result  );  
     })
   }); 
 
-   
+ // return;
  
 ItterTest++;
 it(ItterTest + ")  getTokenOwner :", function() {
@@ -167,51 +150,29 @@ it(ItterTest + ")  getTokenOwner :", function() {
           assert.equal(result[0]  ,53 , 'Ошибка проверки второй страницы с getTokenOwner '+result  );  
     })
   }); 
- 
- 
-  ItterTest++;
-  it(ItterTest + ") выставляем 10 кролика на продажу" , function() {
-    return meta.setMarket( 10, (costRabbit),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value}).then(function(instance) {
-      return meta.totalSupply.call();
-    }).then( (result ) => {
-       assert.equal(result , 53 , ' Кролик не соответствует : ' + result +' address '+meta.address); 
-    })
-  }); 
-
-  ItterTest++;
-  it(ItterTest + ") выставляем 10 кролика на продажу" , function() {
-    return meta.setMarket( 11, (costRabbit*3),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value}).then(function(instance) {
-      return meta.totalSupply.call();
-    }).then( (result ) => {
-       assert.equal(result , 53 , ' Кролик не соответствует : ' + result +' address '+meta.address); 
-    })
-  }); 
-
-
-  ItterTest++;
-  it(ItterTest + ") выставляем 11 кролика на продажу" , function() {
-    return meta.setMarket( 11, (costRabbit*18),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value}).then(function(result) {
-     // return meta.totalSupply.call();
-  //  }).then( (result ) => {
-         assert.equal(53  , 53 , ' Кролик не соответствует : ' + result +' address '+meta.address); 
-    })
-  }); 
-
-  ItterTest++;
-  it(ItterTest + ") выставляем 12 кролика на продажу" , function() {
-    return meta.setMarket( 12, (costRabbit*308),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value}).then(function(result) {
-     // return meta.totalSupply.call();
-  //  }).then( (result ) => {
-         assert.equal(53  , 53 , ' Кролик не соответствует : ' + result +' address '+meta.address); 
-    })
-  }); 
-
- 
+  
+  
  
   ItterTest++;
-  it(ItterTest + ") Дарим 2,3,8,9,10 кролика", function() {
+  it(ItterTest + ") Выставляем на продажу кролика(16,12) и получаем стоимость сверяя её с " + (priceChildren), function() {
+        meta.startMarket( 10, (costRabbit),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
+        meta.startMarket( 11, (costRabbit*18),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
+        meta.startMarket( 21, (costRabbit*354),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
+        meta.startMarket( 23, (costRabbit*826),{from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
+        meta.startMarket( 12, (costRabbit*201), {from: accounts[0], gas:  GasCost ,gasPrice:gasPrice_value});
+        return meta.startMarket(16, priceChildren , {from: accounts[0], gas:GasCost,gasPrice:  gasPrice_value}).then(function() {
+                return meta.currentPrice.call(16);
+              }).then( (result ) => {
+               assert.equal(result ,(priceChildren) , 'Ошибка проверки соответствия цены на нового кролика: ' + result ); 
+        })
+    }); 
 
-
+  
+    
+ 
+   
+  ItterTest++;
+  it(ItterTest + ") Дарим 2,3,8,9,10,16 кролика", function() {
     meta.giff(2, giffes , {from: accounts[0], gas:GasCost,gasPrice: gasPrice_value} );
     meta.giff(8, giffes , {from: accounts[0], gas:GasCost,gasPrice: gasPrice_value} );
     meta.giff(9, giffes , {from: accounts[0], gas:GasCost,gasPrice: gasPrice_value} );
@@ -219,7 +180,6 @@ it(ItterTest + ")  getTokenOwner :", function() {
     meta.giff(16, giffes , {from: accounts[0], gas:GasCost,gasPrice: gasPrice_value} );
     meta.giff(10, giffes , {from: accounts[0], gas:GasCost,gasPrice: gasPrice_value} );
     return meta.giff(3, giffes , {from: accounts[0], gas:GasCost,gasPrice: gasPrice_value}).then(function(instance) {
-
     return meta.ownerOf.call(3);
     }).then( (result ) => {
         assert.equal(result , giffes, 'Подарок не соответстует тому которому подарили : ' + result +' != ' +giffes); 
@@ -237,11 +197,6 @@ it(ItterTest + ")  getTokenOwner :", function() {
      })
    }); 
  
-
- 
-     
-
- 
    ItterTest++;
    it(ItterTest + ") Покупаем кролика #10 ", () =>  { 
     return meta.buyBunny(10, {from: accounts[0], gas:GasCost, gasPrice:  gasPrice_value, value:costRabbit}).then( (result ) => {
@@ -251,12 +206,11 @@ it(ItterTest + ")  getTokenOwner :", function() {
     })
   }); 
   
-
-
+ 
  
   ItterTest++;
   it(ItterTest + ") Покупаем кролика #16 ", () =>  { 
-   return meta.buyBunny(16, {from: accounts[0], gas:GasCost, gasPrice:  gasPrice_value, value:costRabbit}).then( (result ) => {
+   return meta.buyBunny(16, {from: accounts[0], gas:GasCost, gasPrice:  gasPrice_value, value:priceChildren}).then( (result ) => {
    return meta.ownerOf.call(16) ;
    }).then( (result ) => {
      assert.equal(result , accounts[0], ' 2Кролик не принадлежит купившему'+result ); 
@@ -362,11 +316,6 @@ it(ItterTest + ") Проверяем процент полученный от п
         assert.isTrue(true); 
       })
     }); 
-    
-
-
-
-
  
     ItterTest++;
     it(ItterTest + ") Воспроизводим своего ребёнка смешивая гены с "+MotherBunnyID + ' и ' + SireBunnyID +' кроликами', function() {
@@ -388,12 +337,6 @@ it(ItterTest + ") Проверяем процент полученный от п
       })
     }); 
  
-
- 
-
-
-
-    
     ItterTest++;
     it(ItterTest + ") Пытаемся ещё раз родить, но с ошибкой  Кролики: "+MotherBunnyID + ' и ' + SireBunnyID , function() {
         // сколько денег надо для нового кролика?
@@ -405,7 +348,7 @@ it(ItterTest + ") Проверяем процент полученный от п
 
   ItterTest++;
   it(ItterTest + ") Выставляем на продажу кролика("+newBunnyID+") и получаем стоимость сверяя её с " + (priceChildren), function() {
-             return meta.setMarket(newBunnyID, priceChildren , {from: accounts[0], gas:GasCost,gasPrice:  gasPrice_value}).then(function() {
+             return meta.startMarket(newBunnyID, priceChildren , {from: accounts[0], gas:GasCost,gasPrice:  gasPrice_value}).then(function() {
               return meta.currentPrice.call(newBunnyID);
             }).then( (result ) => {
                assert.equal(result ,(priceChildren) , 'Ошибка проверки соответствия цены на нового кролика: ' + result ); 
@@ -466,20 +409,26 @@ it(ItterTest + ") Проверяем процент полученный от п
 
 
     ItterTest++;
-  it(ItterTest + ") Проверяем первую страницу с продажами кроликами, должен вернутся список из кроликов", function() {
+  it(ItterTest + ") Проверяем первую страницу с продажами кроликами, должен вернутся список из кроликов  ", function() {
         return  meta.getBids(1).then(function(result) {
           arrayBunnyPrice = result[0];
-            assert.equal(result[4][6]  ,100000000000000 , 'Ошибка проверки соответствия стоимости кролика '+result[0] ); 
+          
+          assert.equal(result[4][0]  ,201000000000000000 , " Ошибка проверки соответствия стоимости кролика стоимость  \n\r  "+
+            result[4]+"  \n\r  "+
+            ' кролики '+result[0]
+          ); 
+
       })
     });
+    /*
     ItterTest++;
-  it(ItterTest + ") Проверяем вторую страницу с продажами кроликами, должен вернутся список из кроликов", function() {
+  it(ItterTest + ") Проверяем вторую страницу с продажами кроликами, должен вернутся список из кроликов  ", function() {
         return  meta.getBids(2).then(function(result) {
           arrayBunnyPrice = result[0];
-            assert.equal(result[0][0]  ,13 , 'Ошибка проверки второй страницы с продажей   кроликов '+result  ); 
+            assert.equal(result[0][0]  ,13 , 'Ошибка проверки второй страницы с продажей   кроликов '+result[0]  ); 
       })
     }); 
- 
+ */
     ItterTest++;
   it(ItterTest + ") Проверяем кроликов с которыми можно оплодотворять", function() {
         // сраница и итерация появления
@@ -491,7 +440,7 @@ it(ItterTest + ") Проверяем процент полученный от п
   
     ItterTest++;
     it(ItterTest + ") Проверка на ошибку. Можно ли установить стоимость кролику который нам не принадлежит. Если хорошо, то нельзя", function() { 
-        expectRevert(meta.setMarket(2, priceBunny , {from: accounts[0], gas:GasCost,gasPrice:  gasPrice_value}));
+        expectRevert(meta.startMarket(2, priceBunny , {from: accounts[0], gas:GasCost,gasPrice:  gasPrice_value}));
       }); 
 
       ItterTest++;
