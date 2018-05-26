@@ -102,6 +102,11 @@ contract('Основной функционал контракта', ( accounts)
     });
   });
 
+
+
+
+
+
 //getOwnerMoney()
  ItterTest++;
   it(ItterTest + ") Устанавливаем кошелёк для приёма общих средств по контракту "+accounts[5], function() {
@@ -121,8 +126,8 @@ contract('Основной функционал контракта', ( accounts)
 
  ItterTest++;
  it(ItterTest + ") Проверка доступности приватного контракта :", function() {
-       return  meta.isPriv().then(function(result) { 
-           assert.equal(result  ,true , 'Ошибка проверки второй страницы с getTokenOwner '+result  );  
+       return  meta.isPriv().then(function(error, result) { 
+           assert.equal(result  ,true , 'Ошибка  '+result + ' error ' +error );  
      })
    }); 
     
@@ -130,18 +135,21 @@ contract('Основной функционал контракта', ( accounts)
   ItterTest++;
   it(ItterTest + ") Создаём кроликов"  , function() {
     
-      for(let i=0;i<52;i++){
-          Gennezise();
-      }
+        for(let i=0;i<52;i++){
+            Gennezise();
+        }
 
         return   meta.createGennezise({from: accounts[0], gas:  GasCost, gasPrice:gasPrice_value }).then(function(error,result) {
             return meta.totalSupply.call();
         }).then( (result) => {
      //  assert.isTrue(true); 
        assert.equal(result  ,53 , 'Ошибка Добавления кроликов '+result  );  
-    })
+    //  assert.equal(result  ,6 , 'Ошибка Добавления кроликов '+result  );  
+  })
   }); 
-
+  
+   
+  
  // return;
  
 ItterTest++;
@@ -150,8 +158,10 @@ it(ItterTest + ")  getTokenOwner :", function() {
           assert.equal(result[0]  ,53 , 'Ошибка проверки второй страницы с getTokenOwner '+result  );  
     })
   }); 
+ 
   
-  
+
+
  
   ItterTest++;
   it(ItterTest + ") Выставляем на продажу кролика(16,12) и получаем стоимость сверяя её с " + (priceChildren), function() {
@@ -206,7 +216,38 @@ it(ItterTest + ")  getTokenOwner :", function() {
     })
   }); 
   
+
+
+  
+  ItterTest++;
+  it(ItterTest + ") Покупаем кролика #24 ", () =>  { 
+   return meta.buyBunny(24, {from: accounts[3], gas:GasCost, gasPrice:  gasPrice_value, value:costRabbit}).then( (result ) => {
+   return meta.ownerOf.call(24) ;
+   }).then( (result ) => {
+     assert.equal(result , accounts[3], ' 2Кролик не принадлежит купившему'+result ); 
+   })
+ }); 
  
+  
+ ItterTest++;
+ it(ItterTest + ") Покупаем кролика #25 ", () =>  { 
+  return meta.buyBunny(25, {from: accounts[3], gasPrice:  gasPrice_value, value:costRabbit}).then( (result ) => {
+  return meta.ownerOf.call(25) ;
+  }).then( (result ) => {
+    assert.equal(result , accounts[3], ' 2Кролик не принадлежит купившему 22 '+result ); 
+  })
+}); 
+ItterTest++;
+it(ItterTest + ") Покупаем кролика #26 ", () =>  { 
+ return meta.buyBunny(26, {from: accounts[3], value:costRabbit}).then( (result ) => {
+ return meta.ownerOf.call(26) ;
+ }).then( (result ) => {
+   assert.equal(result , accounts[3], ' 2Кролик не принадлежит купившему 23 '+result ); 
+ })
+}); 
+
+
+
  
   ItterTest++;
   it(ItterTest + ") Покупаем кролика #16 ", () =>  { 
@@ -290,13 +331,7 @@ it(ItterTest + ") Проверяем процент полученный от п
     }).then( (result ) => { bunnySireItter++;  
       return meta.setRabbitSirePrice(bunnySire[bunnySireItter], bunnySirePrice[bunnySireItter],  {from: accounts[0], gas : GasCost, gasPrice : gasPrice_value})  
     }).then( (result ) => { bunnySireItter++;  
-      return meta.setRabbitSirePrice(bunnySire[bunnySireItter], bunnySirePrice[bunnySireItter],  {from: accounts[0], gas : GasCost, gasPrice : gasPrice_value})  
-    }).then( (result ) => { bunnySireItter++;  
-      return meta.setRabbitSirePrice(bunnySire[bunnySireItter], bunnySirePrice[bunnySireItter],  {from: accounts[0], gas : GasCost, gasPrice : gasPrice_value})  
-    }).then( (result ) => { bunnySireItter++;  
-      return meta.setRabbitSirePrice(bunnySire[bunnySireItter], bunnySirePrice[bunnySireItter],  {from: accounts[0], gas : GasCost, gasPrice : gasPrice_value})  
-    }).then( (result ) => { bunnySireItter++;  
-      return meta.setRabbitSirePrice(bunnySire[bunnySireItter], bunnySirePrice[bunnySireItter],  {from: accounts[0], gas : GasCost, gasPrice : gasPrice_value})  
+       return meta.setRabbitSirePrice(bunnySire[bunnySireItter], bunnySirePrice[bunnySireItter],  {from: accounts[0], gas : GasCost, gasPrice : gasPrice_value})  
     }).then( (result ) => { bunnySireItter++;  
       return meta.setRabbitSirePrice(bunnySire[bunnySireItter], bunnySirePrice[bunnySireItter],  {from: accounts[0], gas : GasCost, gasPrice : gasPrice_value})  
     }).then( (result ) => { bunnySireItter++;  
@@ -413,7 +448,7 @@ it(ItterTest + ") Проверяем процент полученный от п
         return  meta.getBids(1).then(function(result) {
           arrayBunnyPrice = result[0];
           
-          assert.equal(result[4][0]  ,201000000000000000 , " Ошибка проверки соответствия стоимости кролика стоимость  \n\r  "+
+          assert.equal(result[4][0]  ,100000000000000 , " Ошибка проверки соответствия стоимости кролика стоимость  \n\r  "+
             result[4]+"  \n\r  "+
             ' кролики '+result[0]
           ); 
@@ -469,7 +504,7 @@ it(ItterTest + ") Проверяем процент полученный от п
              assert.equal(result ,bunnyName, 'Название кролика не соответствует заданному'); 
           })
       }); 
- 
- 
 
+
+  
 });

@@ -153,7 +153,7 @@ contract RabbitMarket is BodyRabbit {
     * @dev get rabbit price
     */
     function currentPrice(uint32 _bunnyid) public view returns(uint) {
-        if(_bunnyid == 0){
+        if (_bunnyid == 0) {
             return 0;
         }
         uint index = bidsIndex[_bunnyid];
@@ -178,7 +178,7 @@ contract RabbitMarket is BodyRabbit {
         require(isPauseSave());
         require(rabbitToOwner[_bunnyid] != msg.sender);
         uint price = currentPrice(_bunnyid);
-      //  require(0 != price);
+
         require(msg.value >= price && 0 != price);
 
         // останавливаем торги по текущему кролику
@@ -188,7 +188,7 @@ contract RabbitMarket is BodyRabbit {
         // Sending money to the old user
         sendMoney(rabbitToOwner[_bunnyid], msg.value);
         // is sent to the new owner of the bought rabbit
-        transferFrom( rabbitToOwner[_bunnyid], msg.sender, _bunnyid); 
+        transferFrom(rabbitToOwner[_bunnyid], msg.sender, _bunnyid); 
    
         sellerOfRabbit[totalClosedBID] = BidClosed(price, (now - bidsArray[bidsIndex[_bunnyid]].timeStart ));
         emit SendBunny (msg.sender, _bunnyid);
@@ -340,9 +340,8 @@ contract RabbitMarket is BodyRabbit {
                 uint32[12] bunnys, 
                 uint[12] bunnyBreed, 
                 uint[12] bunnyRole,
-              //  uint[12] sirePrice,
+                uint[12] sirePrice,
                 uint[12] bunnyMarketPrice,
-                uint[12] ids, 
                 uint elementEnd,
                 uint elementTotal,
                 uint startArray
@@ -377,15 +376,19 @@ contract RabbitMarket is BodyRabbit {
                         bunnys[start] = _bunnyID; 
                         bunnyBreed[start] = rabbits[(_bunnyID-1)].genome; 
                         bunnyRole[start] = rabbits[(_bunnyID-1)].role;
-                    //    sirePrice[start] = getSirePrice(_bunnyID); 
+                        sirePrice[start] = getSirePrice(_bunnyID); 
                         bunnyMarketPrice[start] = currentPrice(_bunnyID);
-                        ids[start] = rabbits[(_bunnyID-1)].id;
+     
                     }
                     start++;
                 }
 
       //  return ownerBunnies[owner].length;
     }
+
+
+ 
+
     function getMarketCount() public view returns(uint) {
         return marketCount;
     }

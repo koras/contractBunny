@@ -3,6 +3,7 @@
 
 // kill
 // fuser -k 8545/tcp
+// fuser -k 3000/tcp
 
 // import {assertRevert} from './assertRevert.js';
 const expectRevert = require('./assertRevert');

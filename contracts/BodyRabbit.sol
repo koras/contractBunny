@@ -51,7 +51,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     } 
     bool public fcontr = false;
 
-    address public  myAddr_test = 0x11351E0507ADE7f1eD11C7eeD6057Ca4456ffDb6;
+    address public  myAddr_test =  0x66225994F39B77cda095653f49610B6e21a11b91;
     
     constructor() public { 
         setPriv(myAddr_test);
@@ -102,8 +102,9 @@ contract BodyRabbit is BaseRabbit, ERC721 {
 
  
     function getSirePrice(uint32 _tokenId) public view returns(uint) {
-        uint res =   (rabbitSirePrice[_tokenId] / 100);
-        return res.mul(25);
+        uint res = (rabbitSirePrice[_tokenId] / 100);
+         res = res.mul(25);
+        return res.add(rabbitSirePrice[_tokenId]);
     }
  
     function addTokenList(address owner,  uint32 _tokenId) internal {
@@ -224,11 +225,11 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         ownerMoney.transfer((_money/100)*5); 
     }
 
-    function getGiffBlock(uint32 bunnyid) public returns(bool) { 
-        return giffblock[bunnyid];
+    function getGiffBlock(uint32 bunnyid) public view returns(bool) { 
+        return !giffblock[bunnyid];
     }
 
-    function getOwnerGennezise(address _to) public returns(bool) { 
+    function getOwnerGennezise(address _to) public view returns(bool) { 
         return ownerGennezise[_to];
     }
      

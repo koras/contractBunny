@@ -73,7 +73,7 @@ contract BaseRabbit  is Ownable {
     } 
     mapping(uint32 => uint) public totalSalaryBunny;
     mapping(uint32 => uint32[]) public rabbitMother;
-    mapping(uint32 => uint) rabbitSirePrice;
+    mapping(uint32 => uint)  public rabbitSirePrice;
     mapping(uint => uint32[]) public sireGenom;
     mapping (uint32 => uint) mapDNK;
    
@@ -98,7 +98,6 @@ contract BaseRabbit  is Ownable {
 
     struct Rabbit { 
          // родители
-        uint id;
         uint32 mother;
         uint32 sire; 
         // блок в котором родился кролик
