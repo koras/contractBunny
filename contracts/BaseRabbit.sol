@@ -72,9 +72,9 @@ contract BaseRabbit  is Ownable {
         _;
     } 
     mapping(uint32 => uint) public totalSalaryBunny;
-    mapping(uint32 => uint32[]) public rabbitMother;
+    mapping(uint32 => uint32[10]) public rabbitMother;
     mapping(uint32 => uint)  public rabbitSirePrice;
-    mapping(uint => uint32[]) public sireGenom;
+    //mapping(uint => uint32[]) public sireGenom;
     mapping (uint32 => uint) mapDNK;
    
     uint32[15] public cooldowns = [

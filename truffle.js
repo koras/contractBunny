@@ -16,7 +16,7 @@ module.exports = {
       host: "127.0.0.1",
       port: 8545, 
      network_id: "*",
-     gas: 6095000,
+     gas: 6395000,
      gasPrice: 10000000000,
    //  gas: 6700000,
    //  gasLimit: 20700000, 
@@ -33,7 +33,7 @@ module.exports = {
       host: "127.0.0.1",
       port: 8545, 
      network_id: "*",
-     gas: 6095000,
+     gas: 6395000,
  //    gasLimit: 22000000,
   //   from: '0x15c7c1d8754e7f47d49126e1ab8964f23c1bf6de',
      from: "0x4a174BaF2E41f5B8A68fc79139C054a541402c79", // default address to use for any transaction Truffle makes during migrations
@@ -51,7 +51,7 @@ module.exports = {
 	solc: {
 		optimizer: {
 			enabled: true,
-			runs: 200
+		//	runs: 200
 		}
 	},
 };

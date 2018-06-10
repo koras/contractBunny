@@ -42,31 +42,24 @@ contract BunnyGame is RabbitMarket {
             uint _money = getpricegen0();
             startMarket(bunnyid, _money);
         }
-        
-        
-
         lastTimeGen0 = now;
         lastIdGen0 = bunnyid; 
         totalGen0++; 
-
         if (promo) {
             giffblock[bunnyid] = true;
         }
     }
+
+    function getGenomeChildren(uint32 _matron, uint32 _sire) public view returns(uint) {
+        uint genome;
+        if (rabbits[(_matron-1)].genome >= rabbits[(_sire-1)].genome) {
+            genome = rabbits[(_matron-1)].genome;
+        } else {
+            genome = rabbits[(_sire-1)].genome;
+        }
+        return genome.add(1);
+    }
     
-
-
-
-
-
-
-
-
-
-
-    /**
-    * @dev create new children
-    */
     function createChildren(uint32 _matron, uint32 _sire) public  payable returns(uint32) {
 
         require(isPriv());
@@ -76,27 +69,17 @@ contract BunnyGame is RabbitMarket {
         require(rabbits[(_sire-1)].role == 1);
         require(_matron != _sire);
 
-        uint genome = 0;
-        uint lastTime;
-        (lastTime,,) = getcoolduwn(_matron);
-        require(now >= lastTime);
-
+        require(getBreed(_matron));
         // Checking the money
-
         uint _sirePrice = rabbitSirePrice[_sire];
         uint _moneyMother = _sirePrice.div(4);
     //    uint _finalCost = _moneyMother + _sirePrice;
         require(msg.value >= (_moneyMother + _sirePrice));
-          
         
         uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
-        if (rabbits[_matron].genome >= rabbits[(_sire-1)].genome) {
-            genome = rabbits[(_matron-1)].genome;
-        } else {
-            genome = rabbits[(_sire-1)].genome;
-        }
-
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome.add(1));
+        
+        uint genome = getGenomeChildren(_matron, _sire);
+        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome);
 
         uint32 bunnyid =  uint32(rabbits.push(rabbit));
         mapDNK[bunnyid] = localdnk;
@@ -108,279 +91,11 @@ contract BunnyGame is RabbitMarket {
         // we establish parents for the child
         setRabbitMother(bunnyid, _matron);
         return bunnyid;
-    }
+    } 
+  
 
 
-
-
-
-    /**
-    * @dev create new children
-    */
-    function createChildren2(uint32 _matron, uint32 _sire) public  payable returns(uint32) {
-
-        require(isPriv());
-        require(isPauseSave());
-        require(rabbitToOwner[_matron] == msg.sender);
-        // Checking for the role
-        require(rabbits[(_sire-1)].role == 1);
-        require(_matron != _sire);
-
-        uint genome = 0;
-        uint lastTime;
-        (lastTime,,) = getcoolduwn(_matron);
-        require(now >= lastTime);
-
-        // Checking the money
-
-        uint _sirePrice = rabbitSirePrice[_sire];
-        uint _moneyMother = _sirePrice.div(4);
-    //    uint _finalCost = _moneyMother + _sirePrice;
-        require(msg.value >= (_moneyMother + _sirePrice));
-          
-        
-        uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
-        if (rabbits[_matron].genome >= rabbits[(_sire-1)].genome) {
-            genome = rabbits[(_matron-1)].genome;
-        } else {
-            genome = rabbits[(_sire-1)].genome;
-        }
-
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome.add(1));
-
-        uint32 bunnyid =  uint32(rabbits.push(rabbit));
-        mapDNK[bunnyid] = localdnk;
-       // _transferMoneyMother(_matron, _moneyMother);
-        rabbitToOwner[_sire].transfer(_sirePrice);
-        coolduwnUP(_matron);
-        // передаём кролика новому обладателю
-        transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk);   
-        // we establish parents for the child
-        setRabbitMother(bunnyid, _matron);
-        return bunnyid;
-    }
-
-
-
-
-    /**
-    * @dev create new children
-    */
-    function createChildren3(uint32 _matron, uint32 _sire) public  payable returns(uint32) {
-
-        require(isPriv());
-        require(isPauseSave());
-        require(rabbitToOwner[_matron] == msg.sender);
-        // Checking for the role
-        require(rabbits[(_sire-1)].role == 1);
-        require(_matron != _sire);
-
-        uint genome = 0;
-        uint lastTime;
-        (lastTime,,) = getcoolduwn(_matron);
-        require(now >= lastTime);
-        // Checking the money
-        uint _sirePrice = rabbitSirePrice[_sire];
-        uint _moneyMother = _sirePrice.div(4);
-    //    uint _finalCost = _moneyMother + _sirePrice;
-        require(msg.value >= (_moneyMother + _sirePrice));
-          
-        
-        uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
-        if (rabbits[_matron].genome >= rabbits[(_sire-1)].genome) {
-            genome = rabbits[(_matron-1)].genome;
-        } else {
-            genome = rabbits[(_sire-1)].genome;
-        }
-
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome.add(1));
-
-        uint32 bunnyid =  uint32(rabbits.push(rabbit));
-        mapDNK[bunnyid] = localdnk;
-       // _transferMoneyMother(_matron, _moneyMother);
-        rabbitToOwner[_sire].transfer(_sirePrice);
-     //   coolduwnUP(_matron);
-        // передаём кролика новому обладателю
-        transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk);   
-        // we establish parents for the child
-        setRabbitMother(bunnyid, _matron);
-        return bunnyid;
-    }
-
-
-    /**
-    * @dev create new children
-    */
-    function createChildren4(uint32 _matron, uint32 _sire) public  payable returns(uint32) {
-
-        require(isPriv());
-        require(isPauseSave());
-        require(rabbitToOwner[_matron] == msg.sender);
-        // Checking for the role
-        require(rabbits[(_sire-1)].role == 1);
-        require(_matron != _sire);
-
-        uint genome = 0;
-     //   uint lastTime;
-     //   (lastTime,,) = getcoolduwn(_matron);
-     //   require(now >= lastTime);
-        // Checking the money
-        uint _sirePrice = rabbitSirePrice[_sire];
-        uint _moneyMother = _sirePrice.div(4);
-    //    uint _finalCost = _moneyMother + _sirePrice;
-        require(msg.value >= (_moneyMother + _sirePrice));
-          
-        
-        uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
-        if (rabbits[_matron].genome >= rabbits[(_sire-1)].genome) {
-            genome = rabbits[(_matron-1)].genome;
-        } else {
-            genome = rabbits[(_sire-1)].genome;
-        }
-
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome.add(1));
-
-        uint32 bunnyid =  uint32(rabbits.push(rabbit));
-        mapDNK[bunnyid] = localdnk;
-       // _transferMoneyMother(_matron, _moneyMother);
-        rabbitToOwner[_sire].transfer(_sirePrice);
-     //   coolduwnUP(_matron);
-        // передаём кролика новому обладателю
-        transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk);   
-        // we establish parents for the child
-        setRabbitMother(bunnyid, _matron);
-        return bunnyid;
-    }
-
-    /**
-    * @dev create new children
-    */
-    function createChildren5(uint32 _matron, uint32 _sire) public  payable returns(uint32) {
-
-        require(isPriv());
-        require(isPauseSave());
-        require(rabbitToOwner[_matron] == msg.sender);
-        // Checking for the role
-        require(rabbits[(_sire-1)].role == 1);
-        require(_matron != _sire);
-
-        uint genome = 0;
-        uint lastTime;
-        (lastTime,,) = getcoolduwn(_matron);
-        require(now >= lastTime);
-        // Checking the money
-        uint _sirePrice = rabbitSirePrice[_sire];
-        uint _moneyMother = _sirePrice.div(4);
-    //    uint _finalCost = _moneyMother + _sirePrice;
-        require(msg.value >= (_moneyMother + _sirePrice));
-          
-        
-        uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
-        if (rabbits[_matron].genome >= rabbits[(_sire-1)].genome) {
-            genome = rabbits[(_matron-1)].genome;
-        } else {
-            genome = rabbits[(_sire-1)].genome;
-        }
-
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome.add(1));
-
-        uint32 bunnyid =  uint32(rabbits.push(rabbit));
-        mapDNK[bunnyid] = localdnk;
-       // _transferMoneyMother(_matron, _moneyMother);
-        rabbitToOwner[_sire].transfer(_sirePrice);
-     //   coolduwnUP(_matron);
-        // передаём кролика новому обладателю
-     //   transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk);   
-        // we establish parents for the child
-        setRabbitMother(bunnyid, _matron);
-        return bunnyid;
-    }
-
-
-
-
-
-
-
-    /**
-    * @dev create new children
-    */
-    function createChildren6(uint32 _matron, uint32 _sire) public  payable returns(uint32) {
-
-        require(isPriv());
-        require(isPauseSave());
-        require(rabbitToOwner[_matron] == msg.sender);
-        // Checking for the role
-        require(rabbits[(_sire-1)].role == 1);
-        require(_matron != _sire);
-
-        uint genome = 0;
-        uint lastTime;
-        (lastTime,,) = getcoolduwn(_matron);
-        require(now >= lastTime);
-        // Checking the money
-        uint _sirePrice = rabbitSirePrice[_sire];
-        uint _moneyMother = _sirePrice.div(4);
-    //    uint _finalCost = _moneyMother + _sirePrice;
-        require(msg.value >= (_moneyMother + _sirePrice));
-          
-        
-        uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
-        if (rabbits[_matron].genome >= rabbits[(_sire-1)].genome) {
-            genome = rabbits[(_matron-1)].genome;
-        } else {
-            genome = rabbits[(_sire-1)].genome;
-        }
-
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome.add(1));
-
-        uint32 bunnyid =  uint32(rabbits.push(rabbit));
-        mapDNK[bunnyid] = localdnk;
-       // _transferMoneyMother(_matron, _moneyMother);
-        rabbitToOwner[_sire].transfer(_sirePrice);
-     //   coolduwnUP(_matron);
-        // передаём кролика новому обладателю
-        transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk);   
-        // we establish parents for the child
-    //    setRabbitMother(bunnyid, _matron);
-        return bunnyid;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-
-
-    /**
-     *  получаем cooldown
-     */
-    function getcoolduwn(uint32 _mother) public view returns(uint lastTime, uint cd, uint lefttime) {
-        cd = rabbits[(_mother-1)].birthCount;
-        if(cd > 14) {
-            cd = 14;
-        }
-        // время когда я могу рожать
-
-        lastTime = (cooldowns[cd] + rabbits[(_mother-1)].birthLastTime);
-
-        if(lastTime > now) {
-            // не могу рожать, осталось до родов 
-            lefttime = lastTime.sub(now);
-        }
-    }
-
-
+  
     /**
      *  Устанавливаем кулдаун на роды
      */
@@ -398,19 +113,45 @@ contract BunnyGame is RabbitMarket {
     function _transferMoneyMother(uint32 _mother, uint _valueMoney) internal {
         require(isPauseSave());
         require(_valueMoney > 0);
-        if (rabbitMother[_mother].length > 0) {
-            uint pastMoney = _valueMoney/uint(rabbitMother[_mother].length);
-            for (uint i=0; i < rabbitMother[_mother].length; i++) {
-                uint32 _parrentMother = rabbitMother[_mother][i];
-                address add = rabbitToOwner[_parrentMother];
-                // платим зарплату
-                totalSalaryBunny[_parrentMother] += pastMoney;
-                add.transfer(pastMoney); // refund previous bidder
+        if (getRabbitMotherCount(_mother) > 0) {
+        
+            uint pastMoney = _valueMoney/getRabbitMotherCount(_mother);
+
+            for (uint i=0; i < getRabbitMotherCount(_mother); i++) {
+                if (rabbitMother[_mother][i] != 0) { 
+                    uint32 _parrentMother = rabbitMother[_mother][i];
+                    address add = rabbitToOwner[_parrentMother];
+                    // платим зарплату
+                    totalSalaryBunny[_parrentMother] += pastMoney;
+                    add.transfer(pastMoney); // refund previous bidder
+                }
             }
             ownerMoney.transfer(_valueMoney); // refund previous bidder
         }
     }
     
+    
+    // /**
+    //  * @param _mother - matron send money for parrent
+    //  * @param _valueMoney - current sale
+    //  */
+    // function _transferMoneyMother(uint32 _mother, uint _valueMoney) internal {
+    //     require(isPauseSave());
+    //     require(_valueMoney > 0);
+
+    //     if (rabbitMother[_mother].length > 0) {
+        
+    //         uint pastMoney = _valueMoney/uint(rabbitMother[_mother].length);
+    //         for (uint i=0; i < rabbitMother[_mother].length; i++) {
+    //             uint32 _parrentMother = rabbitMother[_mother][i];
+    //             address add = rabbitToOwner[_parrentMother];
+    //             // платим зарплату
+    //             totalSalaryBunny[_parrentMother] += pastMoney;
+    //             add.transfer(pastMoney); // refund previous bidder
+    //         }
+    //         ownerMoney.transfer(_valueMoney); // refund previous bidder
+    //     }
+    // }
     
     /**
     * @dev We set the cost of renting our genes
@@ -431,9 +172,8 @@ contract BunnyGame is RabbitMarket {
 
         rabbits[(_rabbitid-1)].role = 1;
         rabbitSirePrice[_rabbitid] = price;
-        uint gen = rabbits[(_rabbitid-1)].genome;
-
-        sireGenom[gen].push(_rabbitid);
+        //uint gen = rabbits[(_rabbitid-1)].genome;
+ 
         return true;
     }
  
@@ -448,35 +188,10 @@ contract BunnyGame is RabbitMarket {
         rabbits[(_rabbitid-1)].role = 0;
         rabbitSirePrice[_rabbitid] = 0;
 
-        deleteSire(_rabbitid);
+        //deleteSire(_rabbitid);
         return true;
     }
-
-
-
-     function deleteSire(uint32 _tokenId) internal { 
-        uint gen = rabbits[(_tokenId-1)].genome;
-
-        uint count = sireGenom[gen].length;
-     //   if(0 == count) {
-      //      return;
-      //  }
-        for (uint i = 0; i < count; i++) {
-            if(sireGenom[gen][i] == _tokenId)
-            { 
-                delete sireGenom[gen][i];
-                if(count > 0 && count != (i-1)){
-                    sireGenom[gen][i] = sireGenom[gen][(count-1)];
-                    delete sireGenom[gen][(count-1)];
-                } 
-                sireGenom[gen].length--;
-                return;
-            } 
-        }
-    }
-
-
-
+ 
     
     /**
     *  @dev give the name and description for the rabbit
@@ -513,6 +228,4 @@ contract BunnyGame is RabbitMarket {
         require(address(this).balance >= _value);
         ownerMoney.transfer(_value);
     }
- 
- 
 }

@@ -51,7 +51,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     } 
     bool public fcontr = false;
 
-    address public  myAddr_test =  0x66225994F39B77cda095653f49610B6e21a11b91;
+    address public  myAddr_test = 0x0D38bb34eEe8E4C041Beb61783Ac038b8957233A;
     
     constructor() public { 
         setPriv(myAddr_test);
@@ -118,27 +118,20 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         address currentOwner = msg.sender;
         address oldOwner = rabbitToOwner[_tokenId];
         require(rabbitToOwner[_tokenId] == msg.sender);
-       // require(currentOwner == ownerOf(_tokenId));
         require(currentOwner != _to);
         require(_to != address(0));
-        
         removeTokenList(oldOwner, _tokenId);
         addTokenList(_to, _tokenId);
-        
-     //   rabbitToOwner[_tokenId] = _to; 
         emit Transfer(oldOwner, _to, _tokenId);
     }
 
     function transferFrom(address _from, address _to, uint32 _tokenId) internal {
-
-      //  address currentOwner = msg.sender;
         address oldOwner = rabbitToOwner[_tokenId];
         require(oldOwner == _from);
         require(oldOwner != _to);
         require(_to != address(0));
         removeTokenList(oldOwner, _tokenId);
-        addTokenList(_to, _tokenId);
-       // rabbitToOwner[_tokenId] = _to; 
+        addTokenList(_to, _tokenId); 
         emit Transfer (oldOwner, _to, _tokenId);
     }  
     
@@ -168,15 +161,42 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         list = ownerBunnies[owner];
     } 
 
-    
-    function setRabbitMother(uint32 children, uint32 mother) internal { 
-        
-        if (rabbitMother[mother].length > 0) {
-            rabbitMother[children] = rabbitMother[mother];
+    function setRabbitMother(uint32 children, uint32 mother) public returns( uint start ){ //internal
+        uint32[11] memory ar;
+       // uint start = 0;
+        for (uint i = 0; i < 10; i++) {
+            if (rabbitMother[mother][i] != 0) {
+              ar[start] = uint32(rabbitMother[mother][i]);
+              rabbitMother[mother][i] = 0;
+              start++;
+            } 
         }
-        rabbitMother[children].push(mother);
+        ar[start] = children;
+        start++;
+        
+        for (uint m = 0; m < 10; m++) {
+             if(start >  10){
+                    rabbitMother[mother][m] = ar[(m+1)];
+             }else{
+                    rabbitMother[mother][m] = ar[m];
+             }
+        }
     }
-     
+
+    function getRabbitMother( uint32 mother) public view returns(uint32[10]){
+        return rabbitMother[mother];
+    }
+
+     function getRabbitMotherCount(uint32 mother) public view returns(uint count) { //internal
+        for (uint m = 0; m < 10 ; m++) {
+            if(rabbitMother[mother][m] != 0 ) { 
+                count++;
+            }
+        }
+    }
+
+
+
     function getRabbitDNK(uint32 bunnyid) public view returns(uint) { 
         return mapDNK[bunnyid];
     }
@@ -225,12 +245,87 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         ownerMoney.transfer((_money/100)*5); 
     }
 
-    function getGiffBlock(uint32 bunnyid) public view returns(bool) { 
-        return !giffblock[bunnyid];
+    function getGiffBlock(uint32 _bunnyid) public view returns(bool) { 
+        return !giffblock[_bunnyid];
     }
 
     function getOwnerGennezise(address _to) public view returns(bool) { 
         return ownerGennezise[_to];
     }
-     
+    
+
+    function getBunny(uint32 _bunny) public view returns(
+        uint32 mother,
+        uint32 sire,
+        uint birthblock,
+        uint birthCount,
+        uint birthLastTime,
+        uint role, 
+        uint genome,
+        bool interbreed,
+        uint leftTime,
+        uint lastTime,
+        uint price
+        )
+        {
+            price = getSirePrice(_bunny);
+            _bunny = _bunny - 1;
+            if(_bunny == 0) {
+                return;
+            }
+                mother = rabbits[_bunny].mother;
+                sire = rabbits[_bunny].sire;
+                birthblock = rabbits[_bunny].birthblock;
+                birthCount = rabbits[_bunny].birthCount;
+                birthLastTime = rabbits[_bunny].birthLastTime;
+                role = rabbits[_bunny].role;
+                genome = rabbits[_bunny].genome;
+                     
+                if(birthCount > 14) {
+                    birthCount = 14;
+                }
+                lastTime = uint(cooldowns[birthCount]);
+                lastTime = lastTime.add(birthLastTime);
+                if(lastTime <= now) {
+                    interbreed = true;
+                } else {
+                    leftTime = lastTime.sub(now);
+                }
+    }
+
+
+    function getBreed(uint32 _bunny) public view returns(
+        bool interbreed
+        )
+        {
+        _bunny = _bunny - 1;
+        if(_bunny == 0) {
+            return;
+        }
+        uint birtTime = rabbits[_bunny].birthLastTime;
+        uint birthCount = rabbits[_bunny].birthCount;
+
+        uint  lastTime = uint(cooldowns[birthCount]);
+        lastTime = lastTime.add(birtTime);
+
+        if(lastTime <= now && rabbits[_bunny].role == 0 ) {
+            interbreed = true;
+        } 
+    }
+    /**
+     *  получаем cooldown
+     */
+    function getcoolduwn(uint32 _mother) public view returns(uint lastTime, uint cd, uint lefttime) {
+        cd = rabbits[(_mother-1)].birthCount;
+        if(cd > 14) {
+            cd = 14;
+        }
+        // время когда я могу рожать
+        lastTime = (cooldowns[cd] + rabbits[(_mother-1)].birthLastTime);
+        if(lastTime > now) {
+            // не могу рожать, осталось до родов 
+            lefttime = lastTime.sub(now);
+        }
+    }
+
 }

@@ -111,31 +111,8 @@ contract RabbitMarket is BodyRabbit {
     */
   
 
-     // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
-    function stopMarket(uint32 _bunnyID) public returns(uint) {
-        require(isPauseSave());
-        // require(rabbitToOwner[_bunnyID] == msg.sender); //dev
-        for (uint i = 0; i <= marketCount; i++) {
-            if (bidsArray[i].rabbitID == _bunnyID) {
-
-                uint indexOld = bidsIndex[_bunnyID];
-
-                delete bidsIndex[_bunnyID];
-
-                delete bidsArray[i];
-                if (marketCount > 0 && i > 0 && marketCount != (i-1)) {
-                    bidsArray[i] = bidsArray[(marketCount-1)];
-                    uint32 b = bidsArray[i].rabbitID;
-                    bidsIndex[b] = indexOld;
-                    
-
-                delete  bidsArray[(marketCount-1)];
-                }
-                return marketCount--;
-            }
-        }
-        return marketCount;
-    }
+ 
+ 
 
     function startMarket(uint32 _bunnyid, uint _money) public returns (uint) {
         require(isPauseSave());
@@ -174,6 +151,57 @@ contract RabbitMarket is BodyRabbit {
         return resMoney;
     }
 
+         // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
+    function stopMarket2(uint32 _bunnyid) public returns(uint) {
+        require(isPauseSave());
+        require(rabbitToOwner[_bunnyid] == msg.sender);  
+        uint i = bidsIndex[_bunnyid];
+
+        uint32 _bunny = bidsArray[i].rabbitID;
+
+       // if (bidsArray[i].rabbitID == _bunnyid) {
+            uint indexOld = bidsIndex[_bunnyid];
+            delete bidsIndex[_bunnyid];
+            delete bidsArray[i];
+
+            if (marketCount > 0 && i > 0 && marketCount != (i-1)) {
+                bidsArray[i] = bidsArray[(marketCount-1)];
+            //    uint32 b = bidsArray[i].rabbitID;
+                bidsIndex[_bunny] = indexOld;
+                    
+            delete  bidsArray[(marketCount-1)];
+            }
+            return marketCount--;
+           // }
+       // }
+        //return marketCount;
+    }
+ 
+
+         // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
+    function stopMarket(uint32 _bunnyid) public returns(uint) {
+        require(isPauseSave());
+        require(rabbitToOwner[_bunnyid] == msg.sender);  
+            uint i = bidsIndex[_bunnyid];
+            if (bidsArray[i].rabbitID == _bunnyid) {
+                uint indexOld = bidsIndex[_bunnyid];
+                delete bidsIndex[_bunnyid];
+                delete bidsArray[i];
+                if (marketCount > 0 && i > 0 && marketCount != (i-1)) {
+                    bidsArray[i] = bidsArray[(marketCount-1)];
+                    uint32 b = bidsArray[i].rabbitID;
+                    bidsIndex[b] = indexOld;
+                    
+                delete  bidsArray[(marketCount-1)];
+                }
+                return marketCount--;
+            }
+        return marketCount;
+    }
+ 
+ 
+
+
     function buyBunny(uint32 _bunnyid) public payable {
         require(isPauseSave());
         require(rabbitToOwner[_bunnyid] != msg.sender);
@@ -182,14 +210,14 @@ contract RabbitMarket is BodyRabbit {
         require(msg.value >= price && 0 != price);
 
         // останавливаем торги по текущему кролику
-        stopMarket(_bunnyid); 
+        
         
         totalClosedBID++;
         // Sending money to the old user
         sendMoney(rabbitToOwner[_bunnyid], msg.value);
         // is sent to the new owner of the bought rabbit
         transferFrom(rabbitToOwner[_bunnyid], msg.sender, _bunnyid); 
-   
+        stopMarket(_bunnyid); 
         sellerOfRabbit[totalClosedBID] = BidClosed(price, (now - bidsArray[bidsIndex[_bunnyid]].timeStart ));
         emit SendBunny (msg.sender, _bunnyid);
     }
@@ -241,45 +269,8 @@ contract RabbitMarket is BodyRabbit {
         return  _money;
     } 
 
-    function getSireList(uint page, uint indexBunny) 
-            public view returns(
-                uint32[12] rabbitID, 
-            //    address[12]rabbitSeller, 
-                uint[12]currentPriceBids,
-                uint elementEnd,
-                uint elementTotal 
-                ) {
-
-                uint32 bunnyID = 0;
-                uint pagecount = 12;
-                uint start = 0;
-
-                if (page < 1) {
-                    page = 1;
-                }
-
-                if (sireGenom[indexBunny].length == 0) {
-                    return;
-                }
-
-                elementEnd = page.mul(pagecount);
-
-                if (elementEnd > sireGenom[indexBunny].length) {
-                    elementEnd = sireGenom[indexBunny].length;
-                }
-
-                elementTotal = sireGenom[indexBunny].length;
-          
-
-                for (uint i = (((page-1)*pagecount)); i < (elementEnd); i++) {
-
-                   bunnyID = uint32(sireGenom[indexBunny][i]);
-                    rabbitID[start] = bunnyID;
-                  //  rabbitSeller[start] = rabbitToOwner[bunnyID]; 
-                    currentPriceBids[start] = getSirePrice(bunnyID);
-                    start++;
-                }
-            }
+    
+    
 
 
 
