@@ -2,7 +2,7 @@
 // truffle develop console
 
 
-var BunnyGame = artifacts.require("./BunnyGame.sol");
+var BunnyGame = artifacts.require("./BunnyPages.sol");
  
   
 module.exports = function(deployer) {

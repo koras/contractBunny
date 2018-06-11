@@ -16,7 +16,7 @@ var Web3 = require('web3');
 
 // /home/koras/contracts/publicRabbit/priv
 //const Priv_contract = artifacts.require("/home/koras/contracts/publicRabbit/priv/Migrations.sol");
-const MetaCoin = artifacts.require("./BunnyGame.sol");
+const MetaCoin = artifacts.require("./BunnyPages.sol");
 
 var GasCost = 470000;
 var gasPrice_value = 200000000000; 

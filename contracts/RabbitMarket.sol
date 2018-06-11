@@ -68,11 +68,7 @@ contract RabbitMarket is BodyRabbit {
     // the time which was spent on the sale of the cat
     uint lastTimeGen0;
 
-
-    // number of seals currently on sale
-  //  uint public bidCount = 0;
-
-     
+ 
     /**
     * @param  money;
     * @param  timeStart; 
@@ -151,34 +147,7 @@ contract RabbitMarket is BodyRabbit {
         return resMoney;
     }
 
-         // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
-    function stopMarket2(uint32 _bunnyid) public returns(uint) {
-        require(isPauseSave());
-        require(rabbitToOwner[_bunnyid] == msg.sender);  
-        uint i = bidsIndex[_bunnyid];
-
-        uint32 _bunny = bidsArray[i].rabbitID;
-
-       // if (bidsArray[i].rabbitID == _bunnyid) {
-            uint indexOld = bidsIndex[_bunnyid];
-            delete bidsIndex[_bunnyid];
-            delete bidsArray[i];
-
-            if (marketCount > 0 && i > 0 && marketCount != (i-1)) {
-                bidsArray[i] = bidsArray[(marketCount-1)];
-            //    uint32 b = bidsArray[i].rabbitID;
-                bidsIndex[_bunny] = indexOld;
-                    
-            delete  bidsArray[(marketCount-1)];
-            }
-            return marketCount--;
-           // }
-       // }
-        //return marketCount;
-    }
- 
-
-         // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
+    // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     function stopMarket(uint32 _bunnyid) public returns(uint) {
         require(isPauseSave());
         require(rabbitToOwner[_bunnyid] == msg.sender);  
@@ -272,46 +241,7 @@ contract RabbitMarket is BodyRabbit {
     
     
 
-
-
-    // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
-    function getBids(uint page) 
-            public view returns(
-                uint32[12] rabbitID, 
-                address[12]rabbitSeller, 
-                uint[12]startMoneyBids, 
-                uint[12]timeStartBids, 
-                uint[12]currentPriceBids,
-                uint elementEnd,
-                uint elementTotal
-                ) {
-
-                uint32 bunnyID = 0;
-                uint pagecount = 12;
-                uint start = 0;
-
-                if (page < 1) {
-                    page = 1;
-                }
-                
-                elementEnd = page.mul(pagecount);
-
-                if (elementEnd > marketCount) {
-                    elementEnd = marketCount;
-                }
-
-                elementTotal = marketCount;
-              //  uint startArray = (((page-1)*pagecount)+1);
-                for (uint i = (((page-1)*pagecount)+1); i < (elementEnd+1); i++) {
-                    bunnyID = uint32(bidsArray[i].rabbitID);
-                    rabbitID[start] = bunnyID;
-                    rabbitSeller[start] = rabbitToOwner[bunnyID]; 
-                    startMoneyBids[start] = bidsArray[i].startMoney; 
-                    timeStartBids[start] = bidsArray[i].timeStart;
-                    currentPriceBids[start] = currentPrice(bunnyID);
-                    start++;
-                }
-            }
+ 
 
 
 
@@ -326,57 +256,7 @@ contract RabbitMarket is BodyRabbit {
         transferFrom(msg.sender, add, bunnyid);
     }
 
-    function getTokenList(uint page, address owner) public view returns(
-   
-                uint32[12] bunnys, 
-                uint[12] bunnyBreed, 
-                uint[12] bunnyRole,
-                uint[12] sirePrice,
-                uint[12] bunnyMarketPrice,
-                uint elementEnd,
-                uint elementTotal,
-                uint startArray
-                ) {
-
-                uint32 _bunnyID = 0;
-                //uint pagecount = 12;
-                uint start = 0;
-
-                if (page < 1) {
-                    page = 1;
-                }
-                
-                elementTotal = ownerBunnies[owner].length;
-                elementEnd = page.mul(12);
-
-                if (elementEnd > elementTotal) {
-                    elementEnd = elementTotal;
-                }
  
-                startArray = (((page-1)*12)+1);
-
-                if(ownerBunnies[owner].length == 0) {
-                    return;
-                }
-                for (uint i = startArray; i < (elementEnd+1); ++i) {
-
-                    _bunnyID = ownerBunnies[owner][(i-1)];
-                   // bunnys[start] = _bunnyID;
-
-                    if(_bunnyID != 0) {  
-                        bunnys[start] = _bunnyID; 
-                        bunnyBreed[start] = rabbits[(_bunnyID-1)].genome; 
-                        bunnyRole[start] = rabbits[(_bunnyID-1)].role;
-                        sirePrice[start] = getSirePrice(_bunnyID); 
-                        bunnyMarketPrice[start] = currentPrice(_bunnyID);
-     
-                    }
-                    start++;
-                }
-
-      //  return ownerBunnies[owner].length;
-    }
-
 
  
 

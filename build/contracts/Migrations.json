@@ -1,0 +1,97 @@
+{
+  "contractName": "Migrations",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3006080604052600080fd00a165627a7a7230582057d17ae4246e707dad415628711d4efe2a3fe8c358254aa9051694ee7afef1960029",
+  "deployedBytecode": "0x6080604052600080fd00a165627a7a7230582057d17ae4246e707dad415628711d4efe2a3fe8c358254aa9051694ee7afef1960029",
+  "sourceMap": "68:36:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;68:36:3;;;;;;;",
+  "deployedSourceMap": "68:36:3:-;;;;;",
+  "source": "pragma solidity ^0.4.23;\n\n//import \"./RabbitMarket.sol\";\n\n/**\n* \n*/\ncontract Migrations {    \n  \n     \n}\n\n\n     ",
+  "sourcePath": "/home/koras/contracts/publicRabbit/pub/contracts/Migrations.sol",
+  "ast": {
+    "absolutePath": "/home/koras/contracts/publicRabbit/pub/contracts/Migrations.sol",
+    "exportedSymbols": {
+      "Migrations": [
+        2338
+      ]
+    },
+    "id": 2339,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2337,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:3"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "\n",
+        "fullyImplemented": true,
+        "id": 2338,
+        "linearizedBaseContracts": [
+          2338
+        ],
+        "name": "Migrations",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 2339,
+        "src": "68:36:3"
+      }
+    ],
+    "src": "0:112:3"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/koras/contracts/publicRabbit/pub/contracts/Migrations.sol",
+    "exportedSymbols": {
+      "Migrations": [
+        2338
+      ]
+    },
+    "id": 2339,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2337,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:3"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "\n",
+        "fullyImplemented": true,
+        "id": 2338,
+        "linearizedBaseContracts": [
+          2338
+        ],
+        "name": "Migrations",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 2339,
+        "src": "68:36:3"
+      }
+    ],
+    "src": "0:112:3"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.0",
+  "updatedAt": "2018-06-08T19:34:39.532Z"
+}

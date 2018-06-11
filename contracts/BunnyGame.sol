@@ -130,29 +130,6 @@ contract BunnyGame is RabbitMarket {
         }
     }
     
-    
-    // /**
-    //  * @param _mother - matron send money for parrent
-    //  * @param _valueMoney - current sale
-    //  */
-    // function _transferMoneyMother(uint32 _mother, uint _valueMoney) internal {
-    //     require(isPauseSave());
-    //     require(_valueMoney > 0);
-
-    //     if (rabbitMother[_mother].length > 0) {
-        
-    //         uint pastMoney = _valueMoney/uint(rabbitMother[_mother].length);
-    //         for (uint i=0; i < rabbitMother[_mother].length; i++) {
-    //             uint32 _parrentMother = rabbitMother[_mother][i];
-    //             address add = rabbitToOwner[_parrentMother];
-    //             // платим зарплату
-    //             totalSalaryBunny[_parrentMother] += pastMoney;
-    //             add.transfer(pastMoney); // refund previous bidder
-    //         }
-    //         ownerMoney.transfer(_valueMoney); // refund previous bidder
-    //     }
-    // }
-    
     /**
     * @dev We set the cost of renting our genes
     * @param price rent price
@@ -172,8 +149,8 @@ contract BunnyGame is RabbitMarket {
 
         rabbits[(_rabbitid-1)].role = 1;
         rabbitSirePrice[_rabbitid] = price;
-        //uint gen = rabbits[(_rabbitid-1)].genome;
- 
+        uint gen = rabbits[(_rabbitid-1)].genome;
+        sireGenom[gen].push(_rabbitid);
         return true;
     }
  
@@ -188,10 +165,30 @@ contract BunnyGame is RabbitMarket {
         rabbits[(_rabbitid-1)].role = 0;
         rabbitSirePrice[_rabbitid] = 0;
 
-        //deleteSire(_rabbitid);
+        deleteSire(_rabbitid);
         return true;
     }
- 
+    
+      function deleteSire(uint32 _tokenId) internal { 
+        uint gen = rabbits[(_tokenId-1)].genome;
+
+        uint count = sireGenom[gen].length;
+     //   if(0 == count) {
+      //      return;
+      //  }
+        for (uint i = 0; i < count; i++) {
+            if(sireGenom[gen][i] == _tokenId)
+            { 
+                delete sireGenom[gen][i];
+                if(count > 0 && count != (i-1)){
+                    sireGenom[gen][i] = sireGenom[gen][(count-1)];
+                    delete sireGenom[gen][(count-1)];
+                } 
+                sireGenom[gen].length--;
+                return;
+            } 
+        }
+    }
     
     /**
     *  @dev give the name and description for the rabbit
