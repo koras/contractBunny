@@ -7,14 +7,10 @@ import "./BunnyGame.sol";
 */
 
 contract BunnyPages is BunnyGame {
- 
-
     function getTokenList(uint page, address owner) public view returns(
-   
                 uint32[12] bunnys, 
                 uint[12] bunnyBreed, 
-                uint[12] bunnyRole,
-                uint[12] sirePrice,
+                uint[12] bunnyRole, 
                 uint[12] bunnyMarketPrice,
                 uint elementEnd,
                 uint elementTotal,
@@ -66,9 +62,11 @@ contract BunnyPages is BunnyGame {
             public view returns(
                 uint32[12] rabbitID, 
                 address[12]rabbitSeller, 
-                uint[12]startMoneyBids, 
+                uint[12]role, 
                 uint[12]timeStartBids, 
                 uint[12]currentPriceBids,
+                uint[12]bunnyBreed,
+                 
                 uint elementEnd,
                 uint elementTotal
                 ) {
@@ -93,7 +91,9 @@ contract BunnyPages is BunnyGame {
                     bunnyID = uint32(bidsArray[i].rabbitID);
                     rabbitID[start] = bunnyID;
                     rabbitSeller[start] = rabbitToOwner[bunnyID]; 
-                    startMoneyBids[start] = bidsArray[i].startMoney; 
+                    role[start] = bidsArray[i].startMoney; 
+         
+                    bunnyBreed[start] = rabbits[bunnyID].genome; 
                     timeStartBids[start] = bidsArray[i].timeStart;
                     currentPriceBids[start] = currentPrice(bunnyID);
                     start++;

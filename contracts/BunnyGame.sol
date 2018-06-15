@@ -114,9 +114,8 @@ contract BunnyGame is RabbitMarket {
         require(isPauseSave());
         require(_valueMoney > 0);
         if (getRabbitMotherCount(_mother) > 0) {
-        
+            
             uint pastMoney = _valueMoney/getRabbitMotherCount(_mother);
-
             for (uint i=0; i < getRabbitMotherCount(_mother); i++) {
                 if (rabbitMother[_mother][i] != 0) { 
                     uint32 _parrentMother = rabbitMother[_mother][i];

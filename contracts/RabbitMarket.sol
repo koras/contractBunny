@@ -129,22 +129,14 @@ contract RabbitMarket is BodyRabbit {
         if (_bunnyid == 0) {
             return 0;
         }
+
         uint index = bidsIndex[_bunnyid];
-        uint timeStart = bidsArray[index].timeStart;
-        uint startMoney = bidsArray[index].startMoney;
-        uint resMoney = 0;
-        uint rangeTime = now - timeStart;
-        if(stepMoney != 0) { 
-            uint iter = rangeTime / stepMoney;
-            if(iter != 0 && startMoney != 0) {
-                uint range = startMoney / 1000;
-                resMoney = startMoney - range*10;
-             }else{
-                 resMoney = startMoney;
-             }
+        uint Money = bidsArray[index].startMoney;
+        if(Money > 0){
+            uint moneyComs = Money.div(100);
+            moneyComs = moneyComs.mul(5);
+            return Money.add(moneyComs);
         }
-        
-        return resMoney;
     }
 
     // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
