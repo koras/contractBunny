@@ -51,7 +51,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     } 
     bool public fcontr = false;
 
-    address public  myAddr_test = 0x0D38bb34eEe8E4C041Beb61783Ac038b8957233A;
+    address public  myAddr_test = 0xde1Ab40a02a65531802Dad2146eBa04654Eb58a8;
     
     constructor() public { 
         setPriv(myAddr_test);
@@ -101,11 +101,20 @@ contract BodyRabbit is BaseRabbit, ERC721 {
 
 
  
+
     function getSirePrice(uint32 _tokenId) public view returns(uint) {
-        uint res = (rabbitSirePrice[_tokenId] / 100);
-         res = res.mul(25);
-        return res.add(rabbitSirePrice[_tokenId]);
+        if(rabbits[(_tokenId-1)].role == 1){
+            uint procent = (rabbitSirePrice[_tokenId] / 100);
+            uint res = procent.mul(25);
+            uint system  = procent.mul(commission_system);
+
+            res = res.add(rabbitSirePrice[_tokenId]);
+            return res.add(system); 
+        } else {
+            return 0;
+        }
     }
+
  
     function addTokenList(address owner,  uint32 _tokenId) internal {
         ownerBunnies[owner].push( _tokenId);
@@ -114,7 +123,6 @@ contract BodyRabbit is BaseRabbit, ERC721 {
  
 
     function transfer(address _to, uint32 _tokenId) internal {
-
         address currentOwner = msg.sender;
         address oldOwner = rabbitToOwner[_tokenId];
         require(rabbitToOwner[_tokenId] == msg.sender);
@@ -143,10 +151,18 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     function isPauseSave() public view returns(bool) {
         return !pauseSave;
     }
+    function isPromoPause() public view returns(bool) {
+        if(msg.sender == ownerServer || msg.sender == ownerCEO){
+            return true;
+        }else{
+            return !promoPause;
+        } 
+    }
 
     function setPauseSave() public onlyOwner  returns(bool) {
         return pauseSave = !pauseSave;
     }
+
     /**
     * for check
     *
@@ -161,7 +177,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         list = ownerBunnies[owner];
     } 
 
-    function setRabbitMother(uint32 children, uint32 mother) public returns( uint start ){ //internal
+    function setRabbitMother(uint32 children, uint32 mother) internal returns( uint start ){ 
         uint32[11] memory ar;
        // uint start = 0;
         for (uint i = 0; i < 10; i++) {
@@ -173,7 +189,6 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         }
         ar[start] = children;
         start++;
-        
         for (uint m = 0; m < 10; m++) {
              if(start >  10){
                     rabbitMother[mother][m] = ar[(m+1)];
@@ -181,7 +196,11 @@ contract BodyRabbit is BaseRabbit, ERC721 {
                     rabbitMother[mother][m] = ar[m];
              }
         }
+        rabbitMotherCount[mother].add(1);
     }
+
+
+
 
     function getRabbitMother( uint32 mother) public view returns(uint32[10]){
         return rabbitMother[mother];
@@ -270,27 +289,25 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         {
             price = getSirePrice(_bunny);
             _bunny = _bunny - 1;
-            if(_bunny == 0) {
-                return;
-            }
-                mother = rabbits[_bunny].mother;
-                sire = rabbits[_bunny].sire;
-                birthblock = rabbits[_bunny].birthblock;
-                birthCount = rabbits[_bunny].birthCount;
-                birthLastTime = rabbits[_bunny].birthLastTime;
-                role = rabbits[_bunny].role;
-                genome = rabbits[_bunny].genome;
+
+            mother = rabbits[_bunny].mother;
+            sire = rabbits[_bunny].sire;
+            birthblock = rabbits[_bunny].birthblock;
+            birthCount = rabbits[_bunny].birthCount;
+            birthLastTime = rabbits[_bunny].birthLastTime;
+            role = rabbits[_bunny].role;
+            genome = rabbits[_bunny].genome;
                      
-                if(birthCount > 14) {
-                    birthCount = 14;
-                }
-                lastTime = uint(cooldowns[birthCount]);
-                lastTime = lastTime.add(birthLastTime);
-                if(lastTime <= now) {
-                    interbreed = true;
-                } else {
-                    leftTime = lastTime.sub(now);
-                }
+            if(birthCount > 14) {
+                birthCount = 14;
+            }
+            lastTime = uint(cooldowns[birthCount]);
+            lastTime = lastTime.add(birthLastTime);
+            if(lastTime <= now) {
+                interbreed = true;
+            } else {
+                leftTime = lastTime.sub(now);
+            }
     }
 
 

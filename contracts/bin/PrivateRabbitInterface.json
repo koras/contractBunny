@@ -1,0 +1,15 @@
+{
+    "abi": "[{\"constant\":true,\"inputs\":[{\"name\":\"dnkmother\",\"type\":\"uint256\"},{\"name\":\"dnksire\",\"type\":\"uint256\"}],\"name\":\"mixDNK\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isUIntPrivate\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getNewRabbit\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]",
+    "bytecode": "",
+    "functionHashes": {
+        "getNewRabbit()": "d6cfc292",
+        "isUIntPrivate()": "ccb0893d",
+        "mixDNK(uint256,uint256)": "024a7fcc"
+    },
+    "gasEstimates": {
+        "creation": {},
+        "external": {},
+        "internal": {}
+    },
+    "runtimeBytecode": ""
+}

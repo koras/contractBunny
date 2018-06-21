@@ -45,6 +45,8 @@ contract BaseRabbit  is Ownable {
     using SafeMath for uint256;
     bool pauseSave = false;
     uint256 bigPrice = 0.0001 ether;
+    
+    uint public commission_system = 5;
      
     // ID the last seal
     uint32 public lastIdGen0;
@@ -58,11 +60,18 @@ contract BaseRabbit  is Ownable {
 
     uint public promoGen0 = 2500;
     uint public promoMoney = 1*bigPrice;
+    bool public promoPause = false;
 
 
     function setPromoGen0(uint _promoGen0) public onlyOwner {
         promoGen0 = _promoGen0;
     }
+
+    function setPromoPause() public onlyOwner {
+        promoPause = !promoPause;
+    }
+
+
 
     function setPromoMoney(uint _promoMoney) public onlyOwner {
         promoMoney = _promoMoney;
@@ -71,8 +80,15 @@ contract BaseRabbit  is Ownable {
         require((lastTimeGen0+timeRangeCreateGen0) < now);
         _;
     } 
+
     mapping(uint32 => uint) public totalSalaryBunny;
     mapping(uint32 => uint32[10]) public rabbitMother;
+    
+    mapping(uint32 => uint) public rabbitMotherCount;
+    
+    // how many times did the rabbit cross
+    mapping(uint32 => uint) public rabbitBreedCount;
+
     mapping(uint32 => uint)  public rabbitSirePrice;
     mapping(uint => uint32[]) public sireGenom;
     mapping (uint32 => uint) mapDNK;

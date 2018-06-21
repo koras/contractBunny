@@ -7,7 +7,7 @@ import "./BodyRabbit.sol";
 contract RabbitMarket is BodyRabbit {
 
     event SendBunny(address newOwnerBunny, uint32 bunnyId);
-
+    event StopMarket(uint32 bunnyId);
  // Long time
     uint stepMoney = 2*60*60;
            
@@ -17,7 +17,7 @@ contract RabbitMarket is BodyRabbit {
     /**
     * @dev number of rabbits participating in the auction
     */
-    uint marketCount = 1; 
+    uint marketCount = 0; 
 
     uint daysperiod = 1;
     uint sec = 1;
@@ -106,10 +106,6 @@ contract RabbitMarket is BodyRabbit {
      /*** 
     */
   
-
- 
- 
-
     function startMarket(uint32 _bunnyid, uint _money) public returns (uint) {
         require(isPauseSave());
         require(_money >= bigPrice);
@@ -117,25 +113,47 @@ contract RabbitMarket is BodyRabbit {
        // _money =  _money;
         stopMarket(_bunnyid); 
         Bids memory bid = Bids(_bunnyid, _money, now);
+      
         bidsArray[marketCount] = bid;
         bidsIndex[_bunnyid] = marketCount;
-        return marketCount++; 
+           marketCount++;
+        return marketCount; 
     }
 
     /**
     * @dev get rabbit price
     */
     function currentPrice(uint32 _bunnyid) public view returns(uint) {
-        if (_bunnyid == 0) {
+        uint index = bidsIndex[_bunnyid];
+        if (index == 0) {
             return 0;
         }
-
-        uint index = bidsIndex[_bunnyid];
         uint Money = bidsArray[index].startMoney;
-        if(Money > 0){
+        if (Money > 0) {
             uint moneyComs = Money.div(100);
             moneyComs = moneyComs.mul(5);
             return Money.add(moneyComs);
+        }
+    }
+
+
+
+    /**
+    * @dev get rabbit price
+    */
+    function currentPrices(uint32 _bunnyid) public view returns( uint index, uint Money, uint32 bunny ) { //test
+        
+        if (_bunnyid == 0) {
+            return;
+        }
+
+         index = bidsIndex[_bunnyid];
+         Money = bidsArray[index].startMoney;
+         bunny = bidsArray[index].rabbitID;
+        if (Money > 0) {
+            uint moneyComs = Money.div(100);
+            moneyComs = moneyComs.mul(5);
+           Money =  Money.add(moneyComs);
         }
     }
 
@@ -152,7 +170,7 @@ contract RabbitMarket is BodyRabbit {
                     bidsArray[i] = bidsArray[(marketCount-1)];
                     uint32 b = bidsArray[i].rabbitID;
                     bidsIndex[b] = indexOld;
-                    
+                    emit StopMarket(_bunnyid);
                 delete  bidsArray[(marketCount-1)];
                 }
                 return marketCount--;
@@ -162,7 +180,10 @@ contract RabbitMarket is BodyRabbit {
  
  
 
-
+    /**
+    * @dev Acquisition of a rabbit from another user
+    * @param _bunnyid  Bunny
+     */
     function buyBunny(uint32 _bunnyid) public payable {
         require(isPauseSave());
         require(rabbitToOwner[_bunnyid] != msg.sender);
@@ -170,9 +191,7 @@ contract RabbitMarket is BodyRabbit {
 
         require(msg.value >= price && 0 != price);
 
-        // останавливаем торги по текущему кролику
-        
-        
+        // stop trading on the current rabbit
         totalClosedBID++;
         // Sending money to the old user
         sendMoney(rabbitToOwner[_bunnyid], msg.value);
@@ -191,6 +210,7 @@ contract RabbitMarket is BodyRabbit {
     function deleteRabbitMarket(uint rabbitid) public pure { 
         rabbitid; 
     } 
+
     /**
     * @param rabbitid rabbit in relation to whom reduce the cost
     */

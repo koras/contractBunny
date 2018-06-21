@@ -12,6 +12,7 @@ contract BunnyPages is BunnyGame {
                 uint[12] bunnyBreed, 
                 uint[12] bunnyRole, 
                 uint[12] bunnyMarketPrice,
+                uint[12] sirePrices, 
                 uint elementEnd,
                 uint elementTotal,
                 uint startArray
@@ -40,65 +41,78 @@ contract BunnyPages is BunnyGame {
                 for (uint i = startArray; i < (elementEnd+1); ++i) {
 
                     _bunnyID = ownerBunnies[owner][(i-1)];
-                   // bunnys[start] = _bunnyID;
 
                     if(_bunnyID != 0) {  
                         bunnys[start] = _bunnyID; 
                         bunnyBreed[start] = rabbits[(_bunnyID-1)].genome; 
                         bunnyRole[start] = rabbits[(_bunnyID-1)].role;
-                        sirePrice[start] = getSirePrice(_bunnyID); 
+                        sirePrices[start] = getSirePrice(_bunnyID); 
                         bunnyMarketPrice[start] = currentPrice(_bunnyID);
      
                     }
                     start++;
                 }
 
-      //  return ownerBunnies[owner].length;
     }
 
+    // uint32[12] rabbitID, 
+    //             address[12]rabbitSeller, 
+    //             uint[12]role, 
+    //             uint[12]currentPriceBids,
+    //          //   uint[12]bunnyBreed,
+    //             uint elementEnd,
+    //             uint elementTotal
 
     // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     function getBids(uint page) 
             public view returns(
                 uint32[12] rabbitID, 
-                address[12]rabbitSeller, 
+                uint[12]genome,
                 uint[12]role, 
-                uint[12]timeStartBids, 
-                uint[12]currentPriceBids,
-                uint[12]bunnyBreed,
-                 
+                address[12]rabbitSeller,  
+                uint[12]currentPriceBids, 
+                uint[12]rabbitMotherCounts,
                 uint elementEnd,
                 uint elementTotal
                 ) {
 
-                uint32 bunnyID = 0;
-                uint pagecount = 12;
+              //  uint32 bunnyID = 0;
+              //  uint pagecount = 12;
                 uint start = 0;
 
                 if (page < 1) {
                     page = 1;
                 }
                 
-                elementEnd = page.mul(pagecount);
+                elementEnd = page.mul(12);
 
-                if (elementEnd > marketCount) {
-                    elementEnd = marketCount;
+                if (elementEnd > (marketCount-1)) {
+                    elementEnd = (marketCount-1);
                 }
 
-                elementTotal = marketCount;
-              //  uint startArray = (((page-1)*pagecount)+1);
-                for (uint i = (((page-1)*pagecount)+1); i < (elementEnd+1); i++) {
-                    bunnyID = uint32(bidsArray[i].rabbitID);
-                    rabbitID[start] = bunnyID;
-                    rabbitSeller[start] = rabbitToOwner[bunnyID]; 
-                    role[start] = bidsArray[i].startMoney; 
-         
-                    bunnyBreed[start] = rabbits[bunnyID].genome; 
-                    timeStartBids[start] = bidsArray[i].timeStart;
-                    currentPriceBids[start] = currentPrice(bunnyID);
+                elementTotal = (marketCount-1);
+
+              //  uint startArray = (((page-1)*12)+1);
+                for (uint i = (((page-1)*12)+1); i < (elementEnd+1); i++) {
+                    
+                  //  bunnyID = uint32(bidsArray[i].rabbitID);
+                    rabbitID[start] = uint32(bidsArray[i].rabbitID);
+                    rabbitSeller[start] = rabbitToOwner[uint32(bidsArray[i].rabbitID)]; 
+                    
+                    role[start] = rabbits[(uint32(bidsArray[i].rabbitID)-1)].role;
+                    
+                    genome[start] = rabbits[(uint32(bidsArray[i].rabbitID)-1)].genome; 
+                    
+                 //   bunnyBreed[start] = rabbits[(bunnyID-1)].birthblock;
+                    // totalSalaryBunnys[start] = totalSalaryBunny[(uint32(bidsArray[i].rabbitID))];
+                    rabbitMotherCounts[start] = rabbitMotherCount[(uint32(bidsArray[i].rabbitID))];
+
+                    currentPriceBids[start] = currentPrice(uint32(bidsArray[i].rabbitID));
                     start++;
                 }
             }
+
+            
     function getSireList(uint page, uint indexBunny) 
             public view returns(
                 uint32[12] rabbitID, 

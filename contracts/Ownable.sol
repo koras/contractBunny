@@ -68,10 +68,7 @@ contract Ownable {
  
         ownerMoney = address(_ownerMoney);
     }
-
-
-
-
+ 
 
     
     function getOwnerMoney() public view onlyOwner returns(address) {

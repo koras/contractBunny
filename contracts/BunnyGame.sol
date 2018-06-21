@@ -8,7 +8,11 @@ import "./RabbitMarket.sol";
 contract BunnyGame is RabbitMarket {    
  
     event NewBunny(uint32 bunnyid, uint dnk, uint256 blocknumber );
+    event ChengeSex(uint32 bunnyid, bool sex);
   
+
+
+
     function transferNewBunny(address _to, uint32 _bunnyid, uint localdnk) internal {
         emit NewBunny(_bunnyid, localdnk, block.number);
         //rabbitToOwner[_bunnyid] = _to; 
@@ -20,13 +24,16 @@ contract BunnyGame is RabbitMarket {
     /***
     * @dev create a new gene and put it up for sale, this operation takes place on the server
     */
-    function createGennezise() public {
+    function createGennezise(uint32 _matron) public {
         bool promo = false;
         require(isPriv());
         require(isPauseSave());
+        require(isPromoPause());
+ 
         if (totalGen0 > promoGen0) { 
             require(msg.sender == ownerServer || msg.sender == ownerCEO);
         } else if (!(msg.sender == ownerServer || msg.sender == ownerCEO)) {
+            // promo action
                 require(!ownerGennezise[msg.sender]);
                 ownerGennezise[msg.sender] = true;
                 promo = true;
@@ -42,13 +49,22 @@ contract BunnyGame is RabbitMarket {
             uint _money = getpricegen0();
             startMarket(bunnyid, _money);
         }
+        
         lastTimeGen0 = now;
         lastIdGen0 = bunnyid; 
         totalGen0++; 
+
+        if (_matron != 0) {
+            setRabbitMother(bunnyid, _matron);
+        }
+
         if (promo) {
             giffblock[bunnyid] = true;
         }
     }
+
+
+
 
     function getGenomeChildren(uint32 _matron, uint32 _sire) public view returns(uint) {
         uint genome;
@@ -70,11 +86,9 @@ contract BunnyGame is RabbitMarket {
         require(_matron != _sire);
 
         require(getBreed(_matron));
-        // Checking the money
-        uint _sirePrice = rabbitSirePrice[_sire];
-        uint _moneyMother = _sirePrice.div(4);
-    //    uint _finalCost = _moneyMother + _sirePrice;
-        require(msg.value >= (_moneyMother + _sirePrice));
+        // Checking the money 
+        
+        require(msg.value >= getSirePrice(_sire));
         
         uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire]);
         
@@ -83,8 +97,18 @@ contract BunnyGame is RabbitMarket {
 
         uint32 bunnyid =  uint32(rabbits.push(rabbit));
         mapDNK[bunnyid] = localdnk;
+
+
+        uint _moneyMother = rabbitSirePrice[_sire].div(4);
+
         _transferMoneyMother(_matron, _moneyMother);
-        rabbitToOwner[_sire].transfer(_sirePrice);
+
+        rabbitToOwner[_sire].transfer(rabbitSirePrice[_sire]);
+
+        uint system = rabbitSirePrice[_sire].div(100);
+        system = system.mul(commission_system);
+        ownerMoney.transfer(system); // refund previous bidder
+
         coolduwnUP(_matron);
         // передаём кролика новому обладателю
         transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk);   
@@ -124,8 +148,7 @@ contract BunnyGame is RabbitMarket {
                     totalSalaryBunny[_parrentMother] += pastMoney;
                     add.transfer(pastMoney); // refund previous bidder
                 }
-            }
-            ownerMoney.transfer(_valueMoney); // refund previous bidder
+            } 
         }
     }
     
@@ -150,6 +173,7 @@ contract BunnyGame is RabbitMarket {
         rabbitSirePrice[_rabbitid] = price;
         uint gen = rabbits[(_rabbitid-1)].genome;
         sireGenom[gen].push(_rabbitid);
+        emit ChengeSex(_rabbitid, true);
         return true;
     }
  
@@ -163,7 +187,6 @@ contract BunnyGame is RabbitMarket {
 
         rabbits[(_rabbitid-1)].role = 0;
         rabbitSirePrice[_rabbitid] = 0;
-
         deleteSire(_rabbitid);
         return true;
     }
@@ -184,6 +207,7 @@ contract BunnyGame is RabbitMarket {
                     delete sireGenom[gen][(count-1)];
                 } 
                 sireGenom[gen].length--;
+                emit ChengeSex(_tokenId, false);
                 return;
             } 
         }
