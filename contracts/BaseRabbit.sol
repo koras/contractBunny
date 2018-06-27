@@ -42,9 +42,12 @@ library SafeMath {
 
 contract BaseRabbit  is Ownable {
        
+
+    address public  myAddr_test = 0x3DD39B55FCAAe9067A3383D3c065b3c71ED4477b;
+    
     using SafeMath for uint256;
     bool pauseSave = false;
-    uint256 bigPrice = 0.0001 ether;
+    uint256 bigPrice = 0.0005 ether;
     
     uint public commission_system = 5;
      
@@ -82,9 +85,9 @@ contract BaseRabbit  is Ownable {
     } 
 
     mapping(uint32 => uint) public totalSalaryBunny;
-    mapping(uint32 => uint32[10]) public rabbitMother;
+    mapping(uint32 => uint32[5]) public rabbitMother;
     
-    mapping(uint32 => uint) public rabbitMotherCount;
+    mapping(uint32 => uint) public motherCount;
     
     // how many times did the rabbit cross
     mapping(uint32 => uint) public rabbitBreedCount;

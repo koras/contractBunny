@@ -8,6 +8,10 @@ contract RabbitMarket is BodyRabbit {
 
     event SendBunny(address newOwnerBunny, uint32 bunnyId);
     event StopMarket(uint32 bunnyId);
+    event StartMarket(uint32 bunnyId, uint money);
+    event BunnyBuy(uint32 bunnyId, uint money);
+ 
+
  // Long time
     uint stepMoney = 2*60*60;
            
@@ -74,108 +78,58 @@ contract RabbitMarket is BodyRabbit {
     * @param  timeStart; 
     * @param  timeFinish; 
     */
-    struct BidClosed {
-        uint money;
-        uint timeRange;  
-    }
+  //  struct BidClosed {
+     //   uint money;
+     //   uint timeRange;  
+  //  }
     /**
     * @param  BidClosed 
     */
-    mapping(uint=>BidClosed) sellerOfRabbit;
+   // mapping(uint=>BidClosed) sellerOfRabbit;
  
     //how many closed auctions
     uint public totalClosedBID = 0;
      
-     
-     
-    /**
-    * @param  _rabbitID;
-    * @param  _rabbitSeller;
-    * @param  startMoney;
-    */
-    struct Bids {
-        uint32 rabbitID; 
-        uint  startMoney;
-        uint  timeStart;
-    }
-    mapping(uint=>Bids) public bidsArray;
+    mapping (uint32 => uint) bunnyCost; 
     mapping(uint32 => uint) bidsIndex;
  
-   // mapping (address => uint) sellerOfRabbit;
-     
-     /*** 
-    */
-  
-    function startMarket(uint32 _bunnyid, uint _money) public returns (uint) {
-        require(isPauseSave());
-        require(_money >= bigPrice);
-        require(rabbitToOwner[_bunnyid] ==  msg.sender);
-       // _money =  _money;
-        stopMarket(_bunnyid); 
-        Bids memory bid = Bids(_bunnyid, _money, now);
-      
-        bidsArray[marketCount] = bid;
-        bidsIndex[_bunnyid] = marketCount;
-           marketCount++;
-        return marketCount; 
-    }
 
     /**
     * @dev get rabbit price
     */
     function currentPrice(uint32 _bunnyid) public view returns(uint) {
-        uint index = bidsIndex[_bunnyid];
-        if (index == 0) {
-            return 0;
-        }
-        uint Money = bidsArray[index].startMoney;
-        if (Money > 0) {
-            uint moneyComs = Money.div(100);
+
+        uint money = bunnyCost[_bunnyid];
+        if (money > 0) {
+            uint moneyComs = money.div(100);
             moneyComs = moneyComs.mul(5);
-            return Money.add(moneyComs);
+            return money.add(moneyComs);
         }
     }
 
 
 
-    /**
-    * @dev get rabbit price
-    */
-    function currentPrices(uint32 _bunnyid) public view returns( uint index, uint Money, uint32 bunny ) { //test
-        
-        if (_bunnyid == 0) {
-            return;
-        }
-
-         index = bidsIndex[_bunnyid];
-         Money = bidsArray[index].startMoney;
-         bunny = bidsArray[index].rabbitID;
-        if (Money > 0) {
-            uint moneyComs = Money.div(100);
-            moneyComs = moneyComs.mul(5);
-           Money =  Money.add(moneyComs);
-        }
+  function startMarket(uint32 _bunnyid, uint _money) public returns (uint) {
+        require(isPauseSave());
+        require(_money >= bigPrice);
+        require(rabbitToOwner[_bunnyid] ==  msg.sender);
+        bunnyCost[_bunnyid] = _money;
+        emit StartMarket(_bunnyid, _money);
+        return marketCount++;
     }
+
+
+
+
+
 
     // https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     function stopMarket(uint32 _bunnyid) public returns(uint) {
         require(isPauseSave());
         require(rabbitToOwner[_bunnyid] == msg.sender);  
-            uint i = bidsIndex[_bunnyid];
-            if (bidsArray[i].rabbitID == _bunnyid) {
-                uint indexOld = bidsIndex[_bunnyid];
-                delete bidsIndex[_bunnyid];
-                delete bidsArray[i];
-                if (marketCount > 0 && i > 0 && marketCount != (i-1)) {
-                    bidsArray[i] = bidsArray[(marketCount-1)];
-                    uint32 b = bidsArray[i].rabbitID;
-                    bidsIndex[b] = indexOld;
-                    emit StopMarket(_bunnyid);
-                delete  bidsArray[(marketCount-1)];
-                }
-                return marketCount--;
-            }
-        return marketCount;
+        bunnyCost[_bunnyid] = 0;
+        emit StopMarket(_bunnyid);
+        return marketCount--;
     }
  
  
@@ -198,7 +152,8 @@ contract RabbitMarket is BodyRabbit {
         // is sent to the new owner of the bought rabbit
         transferFrom(rabbitToOwner[_bunnyid], msg.sender, _bunnyid); 
         stopMarket(_bunnyid); 
-        sellerOfRabbit[totalClosedBID] = BidClosed(price, (now - bidsArray[bidsIndex[_bunnyid]].timeStart ));
+
+        emit BunnyBuy(_bunnyid, price);
         emit SendBunny (msg.sender, _bunnyid);
     }
  
@@ -219,44 +174,8 @@ contract RabbitMarket is BodyRabbit {
         rabbitid;
         step;
     }
-    /**
-    * @dev Get the cost of the zeroth gene necessary to add to the store
-    */
-    function getpricegen0() internal returns(uint _money) {
-        if (totalGen0 <= promoGen0) { 
-           return _money = promoMoney;
-        }
-        uint _time = 0;
-        uint lostmoney = 0;
-        uint losttime = 0;
-        uint losttimerange = 0;
-        if ((totalClosedBID-middlelast) > 0) {
-            for (uint32 i = uint32(totalClosedBID-middlelast); i > totalClosedBID; i++) {
-
-                lostmoney = sellerOfRabbit[i].money + lostmoney;
-                losttimerange = sellerOfRabbit[i].timeRange;
-                losttime = losttime + losttimerange;
-            }
-            _money = lostmoney / middlelast;
-            _time = losttime / middlelast;
-             
-            if (middleSaleTime >= _time) {
-                _money = _money.add(_money.div(3));
-            } else {
-                _money = _money.sub(_money.div(3));
-            }
-            middleSaleTime = _time;
-        }
-        return  _money;
-    } 
 
     
-    
-
- 
-
-
-
     /**
     * @dev give a rabbit to a specific user
     * @param add new address owner rabbits
@@ -267,10 +186,6 @@ contract RabbitMarket is BodyRabbit {
         require(!(giffblock[bunnyid]));
         transferFrom(msg.sender, add, bunnyid);
     }
-
- 
-
- 
 
     function getMarketCount() public view returns(uint) {
         return marketCount;
