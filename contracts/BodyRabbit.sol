@@ -16,10 +16,6 @@ contract ERC721 {
     function totalSupply() public view returns (uint total);
     function balanceOf(address _owner) public view returns (uint balance);
 
-    // Events
-    event Transfer(address from, address to, uint32 tokenId);
-    event Approval(address owner, address approved, uint32 tokenId);
-    event OwnerBunnies(address owner, uint32  tokenId);
 }
 
 /// @title Interface new rabbits address
@@ -214,8 +210,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         setMotherCount(mother);
     }
 
-     
-    event EmotherCount(uint32 _mother, uint summ);
+      
 
     function setMotherCount(uint32 _mother) internal returns(uint)  { //internal
          

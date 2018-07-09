@@ -6,11 +6,7 @@ import "./RabbitMarket.sol";
 * 
 */
 contract BunnyGame is RabbitMarket {    
- 
-    event NewBunny(uint32 bunnyid, uint dnk, uint256 blocknumber, uint breed );
-    event ChengeSex(uint32 bunnyid, bool sex);
-    event SalaryBunny(uint32 bunnyid, uint cost);
-    event CreateChildren(uint32 matron, uint32 sire, uint32 child);
+  
    
 
 
@@ -50,10 +46,6 @@ contract BunnyGame is RabbitMarket {
         mapDNK[_bunnyid] = localdnk;
        
         transferNewBunny(msg.sender, _bunnyid, localdnk, 0, 0, 0);  
-      //  if (!promo) { 
-        //    uint _money = getpricegen0();
-         //   startMarket(_bunnyid, _money);
-     //   }
         
         lastTimeGen0 = now;
         lastIdGen0 = _bunnyid; 
@@ -226,6 +218,7 @@ contract BunnyGame is RabbitMarket {
     function setDescriptionRabbit(uint32 rabbitid, string description) public {
         require(isPauseSave());
         require(rabbitToOwner[rabbitid] == msg.sender);
+        emit BunnyDescription(rabbitid, description);
         if (bytes(description).length < 256 && bytes(description).length > 0) {
             rabbitDescription[rabbitid] = description;
         }
@@ -235,19 +228,22 @@ contract BunnyGame is RabbitMarket {
         return rabbitDescription[_rabbitid];
     } 
     
+//    event BunnyName(uint32 bunnyId, string name);
+  //  event BunnyDescription(uint32 bunnyId, string name);
     /**
     *  @dev give the name and description for the rabbit
     * @param name new name rabbits
     */
-    function setNameRabbit(uint32 rabbitid, string name) public {
+    function setNameRabbit(uint32 _rabbitid, string name) public {
         require(isPauseSave());
-        require(rabbitToOwner[rabbitid] == msg.sender);
+        require(rabbitToOwner[_rabbitid] == msg.sender);
+        emit BunnyName(_rabbitid, name);
         if (bytes(name).length < 256 && bytes(name).length > 0) {
-            rabbitName[rabbitid] = name;
+            rabbitName[_rabbitid] = name;
         }
     } 
-    function getNameRabbit(uint32 rabbitid) public view returns(string) {
-        return rabbitName[rabbitid];
+    function getNameRabbit(uint32 _rabbitid) public view returns(string) {
+        return rabbitName[_rabbitid];
     } 
 
     function getMoney(uint _value) public onlyOwner {

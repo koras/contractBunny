@@ -5,11 +5,7 @@ import "./BodyRabbit.sol";
 * sale and bye Rabbits
 */
 contract RabbitMarket is BodyRabbit {
-
-    event SendBunny(address newOwnerBunny, uint32 bunnyId);
-    event StopMarket(uint32 bunnyId);
-    event StartMarket(uint32 bunnyId, uint money);
-    event BunnyBuy(uint32 bunnyId, uint money);
+ 
  
 
  // Long time

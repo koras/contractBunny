@@ -43,8 +43,27 @@ library SafeMath {
 contract BaseRabbit  is Ownable {
        
 
-    address public  myAddr_test = 0x3DD39B55FCAAe9067A3383D3c065b3c71ED4477b;
-    
+
+    event SendBunny(address newOwnerBunny, uint32 bunnyId);
+    event StopMarket(uint32 bunnyId);
+    event StartMarket(uint32 bunnyId, uint money);
+    event BunnyBuy(uint32 bunnyId, uint money);  
+    event EmotherCount(uint32 _mother, uint summ);
+    event NewBunny(uint32 bunnyid, uint dnk, uint256 blocknumber, uint breed );
+    event ChengeSex(uint32 bunnyid, bool sex);
+    event SalaryBunny(uint32 bunnyid, uint cost);
+    event CreateChildren(uint32 matron, uint32 sire, uint32 child);
+    event BunnyName(uint32 bunnyId, string name);
+    event BunnyDescription(uint32 bunnyId, string name);
+
+    event Transfer(address from, address to, uint32 tokenId);
+    event Approval(address owner, address approved, uint32 tokenId);
+    event OwnerBunnies(address owner, uint32  tokenId);
+
+ 
+
+    address public  myAddr_test = 0x3e3b5F986890EC57976d0273EACBBFd5b774161A;
+
     using SafeMath for uint256;
     bool pauseSave = false;
     uint256 bigPrice = 0.0005 ether;

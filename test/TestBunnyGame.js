@@ -546,21 +546,15 @@ contract('Основной функционал контракта', ( accounts)
     })
  }); 
 
-
-  
  it((ItterTest++) + ") Get total money 1"  , function() {
   return meta.getTotalSalaryBunny(1).then(function(result) {
     assert.equal(result, 0, result); 
   })
 }); 
  
- 
-
 
 ItterTest++;
 it(ItterTest + ') Воспроизводим своего ребёнка смешивая гены с 27  и  ' + SireBunnyID +' кроликами за '+(priceChildren+(priceChildren/4)+(priceChildren/100*comission)), function() {
-
-  
     // сколько денег надо для нового кролика?
     // Для нового кролика надо + 25%   
     newprice = priceChildren+(priceChildren/4)+((priceChildren/100)*5);
@@ -572,16 +566,9 @@ it(ItterTest + ') Воспроизводим своего ребёнка сме�
   })
 }); 
 
-//15600000000000000
-//3000000000000000
-
  it((ItterTest++) + ") Get total money 2"  , function() {
   return meta.getTotalSalaryBunny(1).then(function(result) {
     assert.equal(result, 3000000000000000, result); 
   })
 }); 
-
-   
-
-  
 });
