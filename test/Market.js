@@ -4,7 +4,7 @@
 
 // kill
 // fuser -k 8545/tcp
-
+// fuser -k 3000/tcp
 // import {assertRevert} from './assertRevert.js';
 const expectRevert = require('./assertRevert');
 var Web3 = require('web3');
@@ -16,7 +16,7 @@ var Web3 = require('web3');
 
 // /home/koras/contracts/publicRabbit/priv
 //const Priv_contract = artifacts.require("/home/koras/contracts/publicRabbit/priv/Migrations.sol");
-const MetaCoin = artifacts.require("./BunnyPages.sol");
+const MetaCoin = artifacts.require("./BunnyGame.sol");
 
 var GasCost = 470000;
 var gasPrice_value = 200000000000; 

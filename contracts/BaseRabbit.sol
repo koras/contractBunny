@@ -1,6 +1,5 @@
 pragma solidity ^0.4.23;
-
-import "./Ownable.sol";
+import "./Whitelist.sol";
 
 
 
@@ -9,7 +8,7 @@ import "./Ownable.sol";
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -40,82 +39,66 @@ library SafeMath {
 }
  
 
-contract BaseRabbit  is Ownable {
-       
-
-
-    event SendBunny(address newOwnerBunny, uint32 bunnyId);
-    event StopMarket(uint32 bunnyId);
-    event StartMarket(uint32 bunnyId, uint money);
-    event BunnyBuy(uint32 bunnyId, uint money);  
-    event EmotherCount(uint32 _mother, uint summ);
-    event NewBunny(uint32 bunnyid, uint dnk, uint256 blocknumber, uint breed );
-    event ChengeSex(uint32 bunnyid, bool sex);
-    event SalaryBunny(uint32 bunnyid, uint cost);
+contract BaseRabbit  is Whitelist {
+    event EmotherCount(uint32 mother, uint summ);
+    event NewBunny(uint32 bunnyId, uint dnk, uint256 blocknumber, uint breed, uint procentAdmixture, uint admixture);
+    event ChengeSex(uint32 bunnyId, bool sex, uint256 price);
+    event SalaryBunny(uint32 bunnyId, uint cost);
     event CreateChildren(uint32 matron, uint32 sire, uint32 child);
-    event BunnyName(uint32 bunnyId, string name);
     event BunnyDescription(uint32 bunnyId, string name);
-
-    event Transfer(address from, address to, uint32 tokenId);
+    event CoolduwnMother(uint32 bunnyId, uint num);
+    event Referral(address from, uint32 matronID, uint32 childID, uint currentTime);
     event Approval(address owner, address approved, uint32 tokenId);
     event OwnerBunnies(address owner, uint32  tokenId);
+    event Transfer(address from, address to, uint32 tokenId);
 
  
 
-    address public  myAddr_test = 0x3e3b5F986890EC57976d0273EACBBFd5b774161A;
-
     using SafeMath for uint256;
     bool pauseSave = false;
-    uint256 bigPrice = 0.0005 ether;
-    
+    uint256 bigPrice = 0.005 ether;
     uint public commission_system = 5;
      
     // ID the last seal
-    uint32 public lastIdGen0;
+    
     uint public totalGen0 = 0;
-    // ID the last seal
-    uint public lastTimeGen0;
     
     // ID the last seal
-  //  uint public timeRangeCreateGen0 = 1800;
-    uint public timeRangeCreateGen0 = 1;
+  //  uint public timeRangeCreateGen0 = 1800; 
 
-    uint public promoGen0 = 2500;
-    uint public promoMoney = 1*bigPrice;
+    uint public promoGen0 = 15000; 
     bool public promoPause = false;
 
 
-    function setPromoGen0(uint _promoGen0) public onlyOwner {
+    function setPromoGen0(uint _promoGen0) public onlyWhitelisted() {
         promoGen0 = _promoGen0;
     }
 
-    function setPromoPause() public onlyOwner {
+    function setPromoPause() public onlyWhitelisted() {
         promoPause = !promoPause;
     }
 
-
-
-    function setPromoMoney(uint _promoMoney) public onlyOwner {
-        promoMoney = _promoMoney;
+    function setBigPrice(uint _bigPrice) public onlyWhitelisted() {
+        bigPrice = _bigPrice;
     }
-    modifier timeRange() {
-        require((lastTimeGen0+timeRangeCreateGen0) < now);
-        _;
-    } 
 
+ // 
+    // внешняя функция сколько заработала мамочка
     mapping(uint32 => uint) public totalSalaryBunny;
+    // кто мамочка у ребёнка
     mapping(uint32 => uint32[5]) public rabbitMother;
-    
+    // сколько раз стала мамочка текущий кролик
     mapping(uint32 => uint) public motherCount;
-    
-    // how many times did the rabbit cross
-    mapping(uint32 => uint) public rabbitBreedCount;
-
+    // сколько стоиот скрещивание у кролика
     mapping(uint32 => uint)  public rabbitSirePrice;
-    mapping(uint => uint32[]) public sireGenom;
+    // разрешено ли менять кролику пол
+    mapping(uint32 => bool)  public allowedChangeSex;
+
+    // сколько мужиков с текущим геном
+   // mapping(uint => uint32[]) public sireGenom;
     mapping (uint32 => uint) mapDNK;
    
-    uint32[15] public cooldowns = [
+    uint32[12] public cooldowns = [
         uint32(1 minutes),
         uint32(2 minutes),
         uint32(4 minutes),
@@ -127,42 +110,41 @@ contract BaseRabbit  is Ownable {
         uint32(4 hours),
         uint32(8 hours),
         uint32(16 hours),
-        uint32(1 days),
-        uint32(2 days),
-        uint32(4 days),
-        uint32(7 days)
+        uint32(1 days)
     ];
 
 
     struct Rabbit { 
-         // родители
+         // parents
         uint32 mother;
         uint32 sire; 
-        // блок в котором родился кролик
+        // block in which a rabbit was born
         uint birthblock;
-         // количество родов или сколько раз было потомство
+         // number of births or how many times were offspring
         uint birthCount;
-         // Время когда последний раз рожал Кролик
+         // The time when Rabbit last gave birth
         uint birthLastTime;
-        // текущая роль кролика
+        // the current role of the rabbit
         uint role;
         //indexGenome   
         uint genome;
+
+        uint procentAdmixture;
+        uint admixture;
     }
+
+ 
     /**
-    * Там где будем хранить информацию о кроликах
+    * Where we will store information about rabbits
     */
     Rabbit[]  public rabbits;
      
     /**
-    * кому принадлежит кролик
+    * who owns the rabbit
     */
     mapping (uint32 => address) public rabbitToOwner; 
-    mapping(address => uint32[]) public ownerBunnies;
-    //mapping (address => uint) ownerRabbitCount;
-    mapping (uint32 => string) rabbitDescription;
-    mapping (uint32 => string) rabbitName; 
-
+    mapping (address => uint32[]) public ownerBunnies;
+    //mapping (address => uint) ownerRabbitCount; 
     //giff 
     mapping (uint32 => bool) giffblock; 
     mapping (address => bool) ownerGennezise;
