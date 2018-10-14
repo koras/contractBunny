@@ -38,13 +38,62 @@ library SafeMath {
   
 }
  
+/// @title Interface new rabbits address
+contract PrivateRabbitInterface {
+    function getNewRabbit(address from)  public view returns (uint);
+    function mixDNK(uint dnkmother, uint dnksire, uint genome)  public view returns (uint);
+    function isUIntPrivate() public pure returns (bool);
+}
+
+contract TokenBunnyInterface { 
+    
+    function isPromoPause() public view returns(bool);
+    function setTokenBunny(uint32 mother, uint32  sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome, address _owner, uint DNK) external returns(uint32);
+    function publicSetTokenBunnyTest(uint32 mother, uint32  sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome, address _owner, uint DNK) public; 
+    function setMotherCount( uint32 _bunny, uint count) external;
+    function setRabbitSirePrice( uint32 _bunny, uint count) external;
+    function setAllowedChangeSex( uint32 _bunny, bool canBunny) public;
+    function setTotalSalaryBunny( uint32 _bunny, uint count) external;
+    function setRabbitMother(uint32 children, uint32[5] _m) external; 
+    function setDNK( uint32 _bunny, uint dnk) external;
+    function setGiffBlock(uint32 _bunny, bool blocked) external;
+    function transferFrom(address _from, address _to, uint32 _tokenId) public returns(bool);
+    function setOwnerGennezise(address _to, bool canYou) external;
+    function setBirthCount(uint32 _bunny, uint birthCount) external;
+    function setBirthblock(uint32 _bunny, uint birthblock) external; 
+    function setBirthLastTime(uint32 _bunny, uint birthLastTime) external;
+    ////// getters
+ 
+    function getOwnerGennezise(address _to) public view returns(bool);
+    function getAllowedChangeSex(uint32 _bunny) public view returns(bool);
+    function getRabbitSirePrice(uint32 _bunny) public view returns(uint);
+    function getTokenOwner(address owner) public view returns(uint total, uint32[] list); 
+    function getMotherCount(uint32 _mother) public view returns(uint);
+    function getTotalSalaryBunny(uint32 _bunny) public view returns(uint);
+    function getRabbitMother( uint32 mother) public view returns(uint32[5]);
+    function getRabbitMotherSumm(uint32 mother) public view returns(uint count);
+    function getDNK(uint32 bunnyid) public view returns(uint);
+    function getSex(uint32 _bunny) public view returns(bool);
+    function isUIntPublic() public view returns(bool);
+    function balanceOf(address _owner) public view returns (uint);
+    function totalSupply() public view returns (uint total); 
+    function ownerOf(uint32 _tokenId) public view returns (address owner);
+    function getBunnyInfo(uint32 _bunny) external view returns( uint32 mother, uint32 sire, uint birthblock, uint birthCount, uint birthLastTime, bool role, uint genome, bool interbreed, uint leftTime, uint lastTime, uint price, uint motherSumm);
+    function getTokenBunny(uint32 _bunny) public view returns(uint32 mother, uint32 sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome);
+    function getGiffBlock(uint32 _bunny) public view returns(bool);
+
+    function getGenome(uint32 _bunny) public view returns( uint);
+    function getParent(uint32 _bunny) public view returns(uint32 mother, uint32 sire);
+    function getBirthLastTime(uint32 _bunny) public view returns(uint);
+    function getBirthCount(uint32 _bunny) public view returns(uint);
+    function getBirthblock(uint32 _bunny) public view returns(uint);
+        
+}
 
 contract BaseRabbit  is Whitelist {
-    event EmotherCount(uint32 mother, uint summ);
-    event NewBunny(uint32 bunnyId, uint dnk, uint256 blocknumber, uint breed, uint procentAdmixture, uint admixture);
+    event EmotherCount(uint32 mother, uint summ); 
     event ChengeSex(uint32 bunnyId, bool sex, uint256 price);
-    event SalaryBunny(uint32 bunnyId, uint cost);
-    event CreateChildren(uint32 matron, uint32 sire, uint32 child);
+    event SalaryBunny(uint32 bunnyId, uint cost); 
     event BunnyDescription(uint32 bunnyId, string name);
     event CoolduwnMother(uint32 bunnyId, uint num);
     event Referral(address from, uint32 matronID, uint32 childID, uint currentTime);
@@ -53,6 +102,32 @@ contract BaseRabbit  is Whitelist {
     event Transfer(address from, address to, uint32 tokenId);
 
  
+    TokenBunnyInterface TokenBunny;
+    PrivateRabbitInterface privateContract; 
+
+    /**
+    * @dev setting up a new address for a private contract
+    */
+    function setToken(address _addressTokenBunny ) public returns(bool) {
+        addressTokenBunny = _addressTokenBunny;
+        TokenBunny = TokenBunnyInterface(_addressTokenBunny);
+    } 
+    /**
+    * @dev setting up a new address for a private contract
+    */
+    function setPriv(address _privAddress) public returns(bool) {
+        privAddress = _privAddress;
+        privateContract = PrivateRabbitInterface(_privAddress);
+    } 
+    function isPriv() public view returns(bool) {
+        return privateContract.isUIntPrivate();
+    }
+
+    modifier checkPrivate() {
+        require(isPriv());
+        _;
+    }
+
 
     using SafeMath for uint256;
     bool pauseSave = false;
@@ -81,23 +156,7 @@ contract BaseRabbit  is Whitelist {
     function setBigPrice(uint _bigPrice) public onlyWhitelisted() {
         bigPrice = _bigPrice;
     }
-
- // 
-    // внешняя функция сколько заработала мамочка
-    mapping(uint32 => uint) public totalSalaryBunny;
-    // кто мамочка у ребёнка
-    mapping(uint32 => uint32[5]) public rabbitMother;
-    // сколько раз стала мамочка текущий кролик
-    mapping(uint32 => uint) public motherCount;
-    // сколько стоиот скрещивание у кролика
-    mapping(uint32 => uint)  public rabbitSirePrice;
-    // разрешено ли менять кролику пол
-    mapping(uint32 => bool)  public allowedChangeSex;
-
-    // сколько мужиков с текущим геном
-   // mapping(uint => uint32[]) public sireGenom;
-    mapping (uint32 => uint) mapDNK;
-   
+     
     uint32[12] public cooldowns = [
         uint32(1 minutes),
         uint32(2 minutes),
@@ -113,7 +172,6 @@ contract BaseRabbit  is Whitelist {
         uint32(1 days)
     ];
 
-
     struct Rabbit { 
          // parents
         uint32 mother;
@@ -124,29 +182,7 @@ contract BaseRabbit  is Whitelist {
         uint birthCount;
          // The time when Rabbit last gave birth
         uint birthLastTime;
-        // the current role of the rabbit
-        uint role;
         //indexGenome   
-        uint genome;
-
-        uint procentAdmixture;
-        uint admixture;
+        uint genome; 
     }
-
- 
-    /**
-    * Where we will store information about rabbits
-    */
-    Rabbit[]  public rabbits;
-     
-    /**
-    * who owns the rabbit
-    */
-    mapping (uint32 => address) public rabbitToOwner; 
-    mapping (address => uint32[]) public ownerBunnies;
-    //mapping (address => uint) ownerRabbitCount; 
-    //giff 
-    mapping (uint32 => bool) giffblock; 
-    mapping (address => bool) ownerGennezise;
-
 }

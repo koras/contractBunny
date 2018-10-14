@@ -4,67 +4,69 @@ import "./BodyRabbit.sol";
 * Basic actions for the transfer of rights of rabbits
 */ 
  
-contract BunnyGame is BodyRabbit{    
+contract BunnyGame is BodyRabbit {    
   
-    function transferNewBunny(address _to, uint32 _bunnyid, uint localdnk, uint breed, uint32 matron, uint32 sire, uint procentAdmixture, uint admixture) internal {
-        emit NewBunny(_bunnyid, localdnk, block.number, breed, procentAdmixture, admixture);
-        emit CreateChildren(matron, sire, _bunnyid);
-        addTokenList(_to, _bunnyid);
-        totalSalaryBunny[_bunnyid] = 0;
-        motherCount[_bunnyid] = 0;
-        allowedChangeSex[_bunnyid] = true;
-        totalBunny++;
-    }
+    event CreateChildren(uint32 matron, uint32 sire, uint32 child);
+
+   // function transferNewBunny(address _to, uint32 _bunnyid, uint localdnk, uint breed, uint32 matron, uint32 sire) internal {
+   //     emit NewBunny(_bunnyid, localdnk, block.number, breed, 0, 0);
+    //    emit CreateChildren(matron, sire, _bunnyid);
+     //   addTokenList(_to, _bunnyid);
+
+      //  totalSalaryBunny[_bunnyid] = 0;
+       // motherCount[_bunnyid] = 0;
+    //    TokenBunny.setMotherCount(_bunnyid,0);
+      //  allowedChangeSex[_bunnyid] = true;
+
+      //  totalBunny++;
+   // }
 
          
     /***
     * @dev create a new gene and put it up for sale, this operation takes place on the server
     */
     function createGennezise(uint32 _matron) public {
-         
         bool promo = false;
         require(isPriv());
         require(isPauseSave());
         require(isPromoPause());
- 
         if (totalGen0 > promoGen0) { 
             require(getInWhitelist(msg.sender));
         } else if (!(getInWhitelist(msg.sender))) {
             // promo action
-                require(!ownerGennezise[msg.sender]);
-                ownerGennezise[msg.sender] = true;
+                require(!TokenBunny.getOwnerGennezise(msg.sender));
+                TokenBunny.setOwnerGennezise(msg.sender, true);
                 promo = true;
         }
-        
         uint  localdnk = privateContract.getNewRabbit(msg.sender);
-        Rabbit memory _Rabbit =  Rabbit( 0, 0, block.number, 0, 0, 0, 0, 0, 0);
-        uint32 _bunnyid =  uint32(rabbits.push(_Rabbit));
-        mapDNK[_bunnyid] = localdnk;
-       
-        transferNewBunny(msg.sender, _bunnyid, localdnk, 0, 0, 0, 4, 0);  
+        uint32 _bunnyid = TokenBunny.setTokenBunny(0, 0, block.number, 0, 0, 0, msg.sender, localdnk);
+   
+      //  transferNewBunny(msg.sender, _bunnyid, localdnk, 0, 0, 0);  
         
-        
-        totalGen0++; 
-
+      //  totalGen0++; 
         setRabbitMother(_bunnyid, _matron);
-
         emit Referral(msg.sender, _matron, _bunnyid, block.timestamp);
-
-        if (promo) {
-            giffblock[_bunnyid] = true;
+        if (promo) { 
+            TokenBunny.setGiffBlock(_bunnyid, true);
         }
     }
+
+ 
+
+
 
     function getGenomeChildren(uint32 _matron, uint32 _sire) internal view returns(uint) {
         uint genome;
-        if (rabbits[(_matron-1)].genome >= rabbits[(_sire-1)].genome) {
-            genome = rabbits[(_matron-1)].genome;
+        if (TokenBunny.getGenome(_matron) >= TokenBunny.getGenome(_sire)) {
+            genome = TokenBunny.getGenome(_matron);
         } else {
-            genome = rabbits[(_sire-1)].genome;
+            genome = TokenBunny.getGenome(_sire);
         }
         return genome.add(1);
     }
-    
+       
+
+
     /**
     * create a new rabbit, according to the cooldown
     * @param _matron - mother who takes into account the cooldown
@@ -74,9 +76,9 @@ contract BunnyGame is BodyRabbit{
 
         require(isPriv());
         require(isPauseSave());
-        require(rabbitToOwner[_matron] == msg.sender);
+        require(TokenBunny.ownerOf(_matron) == msg.sender);
         // Checking for the role
-        require(rabbits[(_sire-1)].role == 1);
+        require(TokenBunny.getSex(_sire) == true);
         require(_matron != _sire);
 
         require(getBreed(_matron));
@@ -86,30 +88,23 @@ contract BunnyGame is BodyRabbit{
         
         uint genome = getGenomeChildren(_matron, _sire);
 
-        uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire], genome);
-
-        uint procentAdm; 
-        uint admixture;
-        (procentAdm, admixture) = AdmixtureContract.getAdmixture(rabbits[(_sire-1)].procentAdmixture, rabbits[(_matron-1)].procentAdmixture);
-        Rabbit memory rabbit =  Rabbit(_matron, _sire, block.number, 0, 0, 0, genome, procentAdm, admixture);
-
-        uint32 bunnyid =  uint32(rabbits.push(rabbit));
-        mapDNK[bunnyid] = localdnk;
-
-        uint _moneyMother = rabbitSirePrice[_sire].div(4);
+        uint localdnk =  privateContract.mixDNK(TokenBunny.getDNK(_matron), TokenBunny.getDNK(_sire), genome);
+ 
+        uint32 bunnyid = TokenBunny.setTokenBunny(_matron, _sire, block.number, 0, 0, genome, msg.sender, localdnk);
+ 
+ 
+        uint _moneyMother = TokenBunny.getRabbitSirePrice(_sire).div(4);
 
         _transferMoneyMother(_matron, _moneyMother);
 
-        rabbitToOwner[_sire].transfer(rabbitSirePrice[_sire]);
+        TokenBunny.ownerOf(_sire).transfer( TokenBunny.getRabbitSirePrice(_sire) );
+ 
+        uint system = TokenBunny.getRabbitSirePrice(_sire).div(100);
 
-        uint system = rabbitSirePrice[_sire].div(100);
         system = system.mul(commission_system);
         ownerMoney.transfer(system); // refund previous bidder
   
-        coolduwnUP(_matron);
-        // we transfer the rabbit to the new owner
-        transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk, genome, _matron, _sire, procentAdm, admixture );   
-        // we establish parents for the child
+        coolduwnUP(_matron); 
         setRabbitMother(bunnyid, _matron);
         return bunnyid;
     } 
@@ -120,9 +115,11 @@ contract BunnyGame is BodyRabbit{
      */
     function coolduwnUP(uint32 _mother) internal { 
         require(isPauseSave());
-        rabbits[(_mother-1)].birthCount = rabbits[(_mother-1)].birthCount.add(1);
-        rabbits[(_mother-1)].birthLastTime = now;
-        emit CoolduwnMother(_mother, rabbits[(_mother-1)].birthCount);
+
+        uint coolduwn = TokenBunny.getBirthCount(_mother).add(1);
+        TokenBunny.setBirthCount(_mother, coolduwn);
+        TokenBunny.setBirthLastTime(_mother, now);
+        emit CoolduwnMother(_mother, TokenBunny.getBirthCount(_mother));
     }
 
 
@@ -135,14 +132,17 @@ contract BunnyGame is BodyRabbit{
         require(_valueMoney > 0);
         if (getRabbitMotherSumm(_mother) > 0) {
             uint pastMoney = _valueMoney/getRabbitMotherSumm(_mother);
+            
             for (uint i=0; i < getRabbitMotherSumm(_mother); i++) {
-                if (rabbitMother[_mother][i] != 0) { 
-                    uint32 _parrentMother = rabbitMother[_mother][i];
-                    address add = rabbitToOwner[_parrentMother];
-                    // pay salaries
-                    setMotherCount(_parrentMother);
-                    totalSalaryBunny[_parrentMother] += pastMoney;
-                    emit SalaryBunny(_parrentMother, totalSalaryBunny[_parrentMother]);
+
+                if ( TokenBunny.getRabbitMother(_mother)[i] != 0) { 
+                    uint32 _parrentMother = TokenBunny.getRabbitMother(_mother)[i];
+                    address add = TokenBunny.ownerOf(_parrentMother);
+                    // pay salaries 
+
+                    TokenBunny.setMotherCount(_parrentMother, TokenBunny.getMotherCount(_parrentMother).add(1));
+                    TokenBunny.setTotalSalaryBunny( _parrentMother, TokenBunny.getTotalSalaryBunny(_parrentMother).add(pastMoney));
+                    emit SalaryBunny(_parrentMother, TokenBunny.getTotalSalaryBunny(_parrentMother));
                     add.transfer(pastMoney); // refund previous bidder
                 }
             } 
@@ -153,26 +153,24 @@ contract BunnyGame is BodyRabbit{
     * @dev We set the cost of renting our genes
     * @param price rent price
      */
-    function setRabbitSirePrice(uint32 _rabbitid, uint price) public returns(bool) {
+    function setRabbitSirePrice(uint32 _rabbitid, uint price) public {
         require(isPauseSave());
-        require(rabbitToOwner[_rabbitid] == msg.sender);
+        require(TokenBunny.ownerOf(_rabbitid) == msg.sender);
         require(price > bigPrice);
-        require(allowedChangeSex[_rabbitid]);
+ 
+        require(TokenBunny.getAllowedChangeSex(_rabbitid));
+        require(TokenBunny.getRabbitSirePrice(_rabbitid) != price);
 
         uint lastTime;
         (lastTime,,) = getcoolduwn(_rabbitid);
         require(now >= lastTime);
 
-        if (rabbits[(_rabbitid-1)].role == 1 && rabbitSirePrice[_rabbitid] == price) {
-            return false;
-        }
-
-        rabbits[(_rabbitid-1)].role = 1;
-        rabbitSirePrice[_rabbitid] = price;
+        TokenBunny.setRabbitSirePrice(_rabbitid, price);
+        
       //  uint gen = rabbits[(_rabbitid-1)].genome;
        // sireGenom[gen].push(_rabbitid);
         emit ChengeSex(_rabbitid, true, getSirePrice(_rabbitid));
-        return true;
+
     }
  
     /**
@@ -180,33 +178,17 @@ contract BunnyGame is BodyRabbit{
      */
     function setSireStop(uint32 _rabbitid) public returns(bool) {
         require(isPauseSave());
-        require(rabbitToOwner[_rabbitid] == msg.sender);
+        require(TokenBunny.getRabbitSirePrice(_rabbitid) !=0);
+
+        require(TokenBunny.ownerOf(_rabbitid) == msg.sender);
      //   require(rabbits[(_rabbitid-1)].role == 0);
-        rabbits[(_rabbitid-1)].role = 0;
-        rabbitSirePrice[_rabbitid] = 0;
+        TokenBunny.setRabbitSirePrice( _rabbitid, 0);
      //   deleteSire(_rabbitid);
         emit ChengeSex(_rabbitid, false, 0);
         return true;
     }
     
-   //   function deleteSire(uint32 _tokenId) internal { 
-      //  uint gen = rabbits[(_tokenId-1)].genome;
-
-       // uint count = sireGenom[gen].length;
-      //  for (uint i = 0; i < count; i++) {
-         //   if(sireGenom[gen][i] == _tokenId)
-            //{ 
-              //  delete sireGenom[gen][i];
-              //  if(count > 0 && count != (i-1)){
-               //     sireGenom[gen][i] = sireGenom[gen][(count-1)];
-               //     delete sireGenom[gen][(count-1)];
-              //  } 
-              //  sireGenom[gen].length--;
-             //   emit ChengeSex(_tokenId, false, 0);
-            //    return;
-          //  } 
-       // }
-   // } 
+ 
 
     function getMoney(uint _value) public onlyOwner {
         require(address(this).balance >= _value);
@@ -218,11 +200,12 @@ contract BunnyGame is BodyRabbit{
     * @param add new address owner rabbits
     */
     function gift(uint32 bunnyid, address add) public {
-        require(rabbitToOwner[bunnyid] == msg.sender);
-        // a rabbit taken for free can not be given
-        require(!(giffblock[bunnyid]));
         
+        require(TokenBunny.ownerOf(bunnyid) == msg.sender);
+        // a rabbit taken for free can not be given
+        require(!TokenBunny.getGiffBlock(bunnyid));
+        // TokenBunny.ownerOf(
         transferFrom(msg.sender, add, bunnyid);
-        allowedChangeSex[bunnyid] = false;
+        TokenBunny.setAllowedChangeSex(bunnyid, true);
     }
 } 

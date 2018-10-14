@@ -38,8 +38,9 @@ contract Ownable {
     address ownerCEO;
     address ownerMoney;  
      
-    address privAddress; 
+    address privAddress = 0x1418c3AF34FED9fDE57ae0e8Ab06C6a76476E69D; 
     address addressAdmixture;
+    address public addressTokenBunny = 0x152903f9507ff839CEc7CF11898EF89cf5d4fcdb;
     
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender

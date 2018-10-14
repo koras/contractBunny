@@ -2,149 +2,66 @@ pragma solidity ^0.4.23;
  
 import "./BaseRabbit.sol"; 
 
-
-/// @title Interface for contracts conforming to ERC-721: Non-Fungible Tokens
-/// @author Dieter Shirley <dete@axiomzen.co> (https://github.com/dete)
-contract ERC721 {
-    // Required methods 
-
-    function ownerOf(uint32 _tokenId) public view returns (address owner);
-    function approve(address _to, uint32 _tokenId) public returns (bool success);
-    function transfer(address _to, uint32 _tokenId) public;
-    function transferFrom(address _from, address _to, uint32 _tokenId) public returns (bool);
-    function totalSupply() public view returns (uint total);
-    function balanceOf(address _owner) public view returns (uint balance);
-
-}
-
-/// @title Interface new rabbits address
-contract PrivateRabbitInterface {
-    function getNewRabbit(address from)  public view returns (uint);
-    function mixDNK(uint dnkmother, uint dnksire, uint genome)  public view returns (uint);
-    function isUIntPrivate() public pure returns (bool);
-}
-
-contract AdmixtureInterface {
-    function getAdmixture(uint m, uint w)  public view returns (uint procentAdmixture, uint admixture);
-}
-
  
-
-
-contract BodyRabbit is BaseRabbit, ERC721 {
+ 
+contract BodyRabbit is BaseRabbit {
     uint public totalBunny = 0;
     string public constant name = "CryptoRabbits";
     string public constant symbol = "CRB";
 
 
-    PrivateRabbitInterface privateContract;
-    AdmixtureInterface AdmixtureContract;
-
-    /**
-    * @dev setting up a new address for a private contract
-    */
-    function setPriv(address _privAddress) public returns(bool) {
-        privAddress = _privAddress;
-        privateContract = PrivateRabbitInterface(_privAddress);
-    } 
-    function setAdmixture(address _addressAdmixture) public returns(bool) {
-        addressAdmixture = _addressAdmixture;
-        AdmixtureContract = AdmixtureInterface(_addressAdmixture);
-    } 
-
-    bool public fcontr = false;
+   // bool public fcontr = false;
  
     
     constructor() public { 
-        fcontr = true;
+        setPriv(privAddress); 
+        setToken(addressTokenBunny ); 
+     //   fcontr = true;
     }
-
-    function isPriv() public view returns(bool) {
-        return privateContract.isUIntPrivate();
-    }
-
-    modifier checkPrivate() {
-        require(isPriv());
-        _;
-    }
+ 
 
     function ownerOf(uint32 _tokenId) public view returns (address owner) {
-        return rabbitToOwner[_tokenId];
-    }
-
-    function approve(address _to, uint32 _tokenId) public returns (bool) { 
-        _to;
-        _tokenId;
-        return false;
+        return TokenBunny.ownerOf(_tokenId);
     }
 
 
-    function removeTokenList(address _owner, uint32 _tokenId) internal { 
-        uint count = ownerBunnies[_owner].length;
-        for (uint256 i = 0; i < count; i++) {
-            if(ownerBunnies[_owner][i] == _tokenId)
-            { 
-                delete ownerBunnies[_owner][i];
-                if(count > 0 && count != (i-1)){
-                    ownerBunnies[_owner][i] = ownerBunnies[_owner][(count-1)];
-                    delete ownerBunnies[_owner][(count-1)];
-                } 
-                ownerBunnies[_owner].length--;
-                return;
-            } 
-        }
-    }
-    /**
-    * Get the cost of the reward for pairing
-    * @param _tokenId - rabbit that mates
-     */
+ 
+ 
     function getSirePrice(uint32 _tokenId) public view returns(uint) {
-        if(rabbits[(_tokenId-1)].role == 1){
-            uint procent = (rabbitSirePrice[_tokenId] / 100);
+ 
+        if(TokenBunny.getRabbitSirePrice(_tokenId) != 0){
+            uint procent = (TokenBunny.getRabbitSirePrice(_tokenId) / 100);
             uint res = procent.mul(25);
             uint system  = procent.mul(commission_system);
 
-            res = res.add(rabbitSirePrice[_tokenId]);
+            res = res.add( TokenBunny.getRabbitSirePrice(_tokenId));
             return res.add(system); 
         } else {
             return 0;
         }
+
     }
 
     /**
     * @dev add a new bunny in the storage
      */
-    function addTokenList(address owner,  uint32 _tokenId) internal {
-        ownerBunnies[owner].push( _tokenId);
-        emit OwnerBunnies(owner, _tokenId);
-        rabbitToOwner[_tokenId] = owner; 
-    }
+  //  function addTokenList(address owner,  uint32 _tokenId) internal {
+  //      ownerBunnies[owner].push( _tokenId);
+   //////     emit OwnerBunnies(owner, _tokenId);
+   //     rabbitToOwner[_tokenId] = owner; 
+  //  }
  
 
-    function transfer(address _to, uint32 _tokenId) public {
-        address currentOwner = msg.sender;
-        address oldOwner = rabbitToOwner[_tokenId];
-        require(rabbitToOwner[_tokenId] == msg.sender);
-        require(currentOwner != _to);
-        require(_to != address(0));
-        removeTokenList(oldOwner, _tokenId);
-        addTokenList(_to, _tokenId);
-        emit Transfer(oldOwner, _to, _tokenId);
-    }
+  //  function transfer(address _to, uint32 _tokenId) public {
+    //    TokenBunny.transfer(_to, _tokenId);
+   //     emit Transfer( _to, _tokenId);
+    //}
 
-    function transferFrom(address _from, address _to, uint32 _tokenId) public returns(bool) {
-        address oldOwner = rabbitToOwner[_tokenId];
-        require(oldOwner == _from);
-        require(getInWhitelist(msg.sender));
-        require(oldOwner != _to);
-        require(_to != address(0));
-
-        removeTokenList(oldOwner, _tokenId);
-        addTokenList(_to, _tokenId); 
-
-        allowedChangeSex[_tokenId] = true;
-        emit Transfer (oldOwner, _to, _tokenId);
-        return true;
+    function transferFrom(address _from, address _to, uint32 _tokenId) public onlyWhitelisted() returns(bool) {
+        if(TokenBunny.transferFrom(_from, _to, _tokenId)){ 
+            emit Transfer(_from, _to, _tokenId);
+            return true;
+        }
     }  
      
 
@@ -166,8 +83,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
  
 
     function getTokenOwner(address owner) public view returns(uint total, uint32[] list) {
-        total = ownerBunnies[owner].length;
-        list = ownerBunnies[owner];
+        (total, list) = TokenBunny.getTokenOwner(owner);
     } 
 
 
@@ -175,11 +91,14 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     function setRabbitMother(uint32 children, uint32 mother) internal { 
         require(children != mother);
         uint32[11] memory pullMother;
+        uint32[5] memory rabbitMother = TokenBunny.getRabbitMother(mother);
+        uint32[5] memory arrayChildren;
+
         uint start = 0;
         for (uint i = 0; i < 5; i++) {
-            if (rabbitMother[mother][i] != 0) {
-              pullMother[start] = uint32(rabbitMother[mother][i]);
-              //rabbitMother[mother][i] = 0; FIX mistake
+
+            if (rabbitMother[i] != 0) {
+              pullMother[start] = uint32(rabbitMother[i]);
               start++;
             } 
         }
@@ -187,38 +106,26 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         start++;
         for (uint m = 0; m < 5; m++) {
              if(start >  5){
-                    rabbitMother[children][m] = pullMother[(m+1)];
+                    arrayChildren[m] = pullMother[(m+1)];
              }else{
-                    rabbitMother[children][m] = pullMother[m];
+                    arrayChildren[m] = pullMother[m];
              }
-        } 
-        setMotherCount(mother);
+        }
+        TokenBunny.setRabbitMother(children, arrayChildren);
+        uint c = TokenBunny.getMotherCount(mother);
+        TokenBunny.setMotherCount( mother, c.add(1));
     }
 
       
 
-    function setMotherCount(uint32 _mother) internal returns(uint)  { //internal
-        motherCount[_mother] = motherCount[_mother].add(1);
-        emit EmotherCount(_mother, motherCount[_mother]);
-        return motherCount[_mother];
-    } 
+  //  function setMotherCount(uint32 _mother) internal { //internal
+   // //    uint c = TokenBunny.getMotherCount(_mother);
+//TokenBunny.setMotherCount(_mother, c.add(1));
+   //     emit EmotherCount(_mother, c.add(1));
+   // } 
      
-    function bytes32ToString(bytes32 x) internal pure returns (string) {
-        bytes memory bytesString = new bytes(32);
-        uint charCount = 0;
-        for (uint j = 0; j < 32; j++) {
-            byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
-            if (char != 0) {
-                bytesString[charCount] = char;
-                charCount++;
-            }
-        }
-        bytes memory bytesStringTrimmed = new bytes(charCount);
-        for (j = 0; j < charCount; j++) {
-            bytesStringTrimmed[j] = bytesString[j];
-        }
-        return string(bytesStringTrimmed);
-    }
+
+
     
     function uintToBytes(uint v) internal pure returns (bytes32 ret) {
         if (v == 0) {
@@ -233,117 +140,52 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         return ret;
     }
 
-    function totalSupply() public view returns (uint total) {
-        return totalBunny;
-    }
 
-    function balanceOf(address _owner) public view returns (uint) {
-      //  _owner;
-        return ownerBunnies[_owner].length;
-    }
 
     function sendMoney(address _to, uint256 _money) internal { 
         _to.transfer((_money/100)*95);
         ownerMoney.transfer((_money/100)*5); 
     }
 
-    function getGiffBlock(uint32 _bunnyid) public view returns(bool) { 
-        return !giffblock[_bunnyid];
-    }
+   
 
     function getOwnerGennezise(address _to) public view returns(bool) { 
-        return ownerGennezise[_to];
+        return TokenBunny.getOwnerGennezise(_to);
     }
     
 
-    function getBunny(uint32 _bunny) public view returns(
-        uint32 mother,
-        uint32 sire,
-        uint birthblock,
-        uint birthCount,
-        uint birthLastTime,
-        uint role, 
-        uint genome,
-        bool interbreed,
-        uint leftTime,
-        uint lastTime,
-        uint price,
-        uint motherSumm
-        )
-        {
-            price = getSirePrice(_bunny);
-            _bunny = _bunny - 1;
-            mother = rabbits[_bunny].mother;
-            sire = rabbits[_bunny].sire;
-            birthblock = rabbits[_bunny].birthblock;
-            birthCount = rabbits[_bunny].birthCount;
-            birthLastTime = rabbits[_bunny].birthLastTime;
-            role = rabbits[_bunny].role;
-            genome = rabbits[_bunny].genome;
-                     
-            if(birthCount > 11) {
-                birthCount = 11;
-            }
-
-            motherSumm = motherCount[_bunny];
-
-            lastTime = uint(cooldowns[birthCount]);
-            lastTime = lastTime.add(birthLastTime);
-            if(lastTime <= now) {
-                interbreed = true;
-            } else {
-                leftTime = lastTime.sub(now);
-            }
-    }
 
 
-
-    /**
-    * We update the information on rabbits
-     */
-    function updateBunny(uint32 _bunny, uint types, uint data ) public onlyWhitelisted()
-    { 
-        if (types == 1) {
-            rabbits[(_bunny - 1)].birthCount = data;
-        } else if (types == 2) {
-            rabbits[(_bunny - 1)].genome = data;
-        } else if (types == 3) {
-            rabbitSirePrice[_bunny] = data;
-        } else if (types == 4) {
-            motherCount[_bunny] = data;
-            emit EmotherCount(_bunny, data);
-        } 
-
-            
-    }
 
     /**
     * @param _bunny A rabbit on which we receive information
      */
     function getBreed(uint32 _bunny) public view returns(bool interbreed)
         {
-      
-        uint birtTime = rabbits[(_bunny - 1)].birthLastTime;
-        uint birthCount = rabbits[(_bunny - 1)].birthCount;
+            uint birtTime = 0;
+            uint birthCount = 0;
+            (, , , birthCount, birtTime, ) = TokenBunny.getTokenBunny(_bunny);
 
-        uint  lastTime = uint(cooldowns[birthCount]);
-        lastTime = lastTime.add(birtTime);
-
-        if(lastTime <= now && rabbits[(_bunny - 1)].role == 0 ) {
-            interbreed = true;
-        } 
+            uint  lastTime = uint(cooldowns[birthCount]);
+            lastTime = lastTime.add(birtTime);
+ 
+            if(lastTime <= now && TokenBunny.getSex(_bunny) == false) {
+                interbreed = true;
+            }
     }
 
     /**
      *  we get cooldown
      */
     function getcoolduwn(uint32 _mother) public view returns(uint lastTime, uint cd, uint lefttime) {
-        cd = rabbits[(_mother-1)].birthCount;
+        uint birthLastTime;
+         (, , , cd, birthLastTime, ) = TokenBunny.getTokenBunny(_mother);
+
         if(cd > 11) {
             cd = 11;
         }
-        // time when I can give birth
-        lastTime = (cooldowns[cd] + rabbits[(_mother-1)].birthLastTime);
+        // time when I can give birth 
+        lastTime = (cooldowns[cd] + birthLastTime);
         if(lastTime > now) {
             // I can not give birth, it remains until delivery
             lefttime = lastTime.sub(now);
@@ -353,29 +195,30 @@ contract BodyRabbit is BaseRabbit, ERC721 {
 
 
      function getMotherCount(uint32 _mother) public view returns(uint) { //internal
-        return  motherCount[_mother];
+        return TokenBunny.getMotherCount(_mother);
     }
 
 
      function getTotalSalaryBunny(uint32 _bunny) public view returns(uint) { //internal
-        return  totalSalaryBunny[_bunny];
+        return TokenBunny.getTotalSalaryBunny(_bunny);
     }
  
  
     function getRabbitMother( uint32 mother) public view returns(uint32[5]) {
-        return rabbitMother[mother];
+        return TokenBunny.getRabbitMother(mother);
     }
 
      function getRabbitMotherSumm(uint32 mother) public view returns(uint count) { //internal
+        uint32[5] memory rabbitMother = TokenBunny.getRabbitMother(mother);
         for (uint m = 0; m < 5 ; m++) {
-            if(rabbitMother[mother][m] != 0 ) { 
+            if(rabbitMother[m] != 0 ) { 
                 count++;
             }
         }
     }
 
     function getRabbitDNK(uint32 bunnyid) public view returns(uint) { 
-        return mapDNK[bunnyid];
+        return TokenBunny.getDNK(bunnyid);
     }
 
     function isUIntPublic() public view returns(bool) {

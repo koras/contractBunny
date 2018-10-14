@@ -1,0 +1,13 @@
+{
+    "abi": "[{\"constant\":false,\"inputs\":[{\"name\":\"mother\",\"type\":\"uint32\"},{\"name\":\"sire\",\"type\":\"uint32\"},{\"name\":\"birthblock\",\"type\":\"uint256\"},{\"name\":\"birthCount\",\"type\":\"uint256\"},{\"name\":\"birthLastTime\",\"type\":\"uint256\"},{\"name\":\"genome\",\"type\":\"uint256\"},{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"DNK\",\"type\":\"uint256\"}],\"name\":\"setTokenBunny\",\"outputs\":[{\"name\":\"id\",\"type\":\"uint32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+    "bytecode": "",
+    "functionHashes": {
+        "setTokenBunny(uint32,uint32,uint256,uint256,uint256,uint256,address,uint256)": "0a44ab82"
+    },
+    "gasEstimates": {
+        "creation": {},
+        "external": {},
+        "internal": {}
+    },
+    "runtimeBytecode": ""
+}
