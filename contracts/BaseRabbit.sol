@@ -37,7 +37,16 @@ library SafeMath {
     }
   
 }
- 
+ contract ERC721 {
+    // Required methods 
+
+    function ownerOf(uint32 _tokenId) public view returns (address owner);
+    function approve(address _to, uint32 _tokenId) public returns (bool success);
+    function transfer(address _to, uint32 _tokenId) public;
+    function transferFrom(address _from, address _to, uint32 _tokenId) public returns (bool);
+    function totalSupply() public view returns (uint total);
+    function balanceOf(address _owner) public view returns (uint balance);
+ }
 /// @title Interface new rabbits address
 contract PrivateRabbitInterface {
     function getNewRabbit(address from)  public view returns (uint);
@@ -62,8 +71,7 @@ contract TokenBunnyInterface {
     function setBirthCount(uint32 _bunny, uint birthCount) external;
     function setBirthblock(uint32 _bunny, uint birthblock) external; 
     function setBirthLastTime(uint32 _bunny, uint birthLastTime) external;
-    ////// getters
- 
+    // getters
     function getOwnerGennezise(address _to) public view returns(bool);
     function getAllowedChangeSex(uint32 _bunny) public view returns(bool);
     function getRabbitSirePrice(uint32 _bunny) public view returns(uint);
@@ -81,7 +89,6 @@ contract TokenBunnyInterface {
     function getBunnyInfo(uint32 _bunny) external view returns( uint32 mother, uint32 sire, uint birthblock, uint birthCount, uint birthLastTime, bool role, uint genome, bool interbreed, uint leftTime, uint lastTime, uint price, uint motherSumm);
     function getTokenBunny(uint32 _bunny) public view returns(uint32 mother, uint32 sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome);
     function getGiffBlock(uint32 _bunny) public view returns(bool);
-
     function getGenome(uint32 _bunny) public view returns( uint);
     function getParent(uint32 _bunny) public view returns(uint32 mother, uint32 sire);
     function getBirthLastTime(uint32 _bunny) public view returns(uint);
@@ -90,18 +97,16 @@ contract TokenBunnyInterface {
         
 }
 
-contract BaseRabbit  is Whitelist {
+contract BaseRabbit  is Whitelist, ERC721 {
     event EmotherCount(uint32 mother, uint summ); 
     event ChengeSex(uint32 bunnyId, bool sex, uint256 price);
     event SalaryBunny(uint32 bunnyId, uint cost); 
-    event BunnyDescription(uint32 bunnyId, string name);
     event CoolduwnMother(uint32 bunnyId, uint num);
     event Referral(address from, uint32 matronID, uint32 childID, uint currentTime);
     event Approval(address owner, address approved, uint32 tokenId);
     event OwnerBunnies(address owner, uint32  tokenId);
     event Transfer(address from, address to, uint32 tokenId);
-
- 
+    event CreateChildren(uint32 matron, uint32 sire, uint32 child);
     TokenBunnyInterface TokenBunny;
     PrivateRabbitInterface privateContract; 
 
@@ -122,41 +127,28 @@ contract BaseRabbit  is Whitelist {
     function isPriv() public view returns(bool) {
         return privateContract.isUIntPrivate();
     }
-
     modifier checkPrivate() {
         require(isPriv());
         _;
     }
 
-
     using SafeMath for uint256;
-    bool pauseSave = false;
-    uint256 bigPrice = 0.005 ether;
+    bool pauseSave = false; 
     uint public commission_system = 5;
-     
-    // ID the last seal
-    
     uint public totalGen0 = 0;
-    
-    // ID the last seal
-  //  uint public timeRangeCreateGen0 = 1800; 
-
     uint public promoGen0 = 15000; 
     bool public promoPause = false;
-
 
     function setPromoGen0(uint _promoGen0) public onlyWhitelisted() {
         promoGen0 = _promoGen0;
     }
-
     function setPromoPause() public onlyWhitelisted() {
         promoPause = !promoPause;
     }
-
+    uint256 bigPrice = 0.003 ether;
     function setBigPrice(uint _bigPrice) public onlyWhitelisted() {
         bigPrice = _bigPrice;
     }
-     
     uint32[12] public cooldowns = [
         uint32(1 minutes),
         uint32(2 minutes),
@@ -171,18 +163,12 @@ contract BaseRabbit  is Whitelist {
         uint32(16 hours),
         uint32(1 days)
     ];
-
     struct Rabbit { 
-         // parents
         uint32 mother;
         uint32 sire; 
-        // block in which a rabbit was born
         uint birthblock;
-         // number of births or how many times were offspring
         uint birthCount;
-         // The time when Rabbit last gave birth
         uint birthLastTime;
-        //indexGenome   
         uint genome; 
     }
 }

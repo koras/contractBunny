@@ -1,46 +1,33 @@
 pragma solidity ^0.4.23;
 
-
-
 /*
-  ▀█████████▄  ███    █▄  ███▄▄▄▄   ███▄▄▄▄   ▄██   ▄
-    ███    ███ ███    ███ ███▀▀▀██▄ ███▀▀▀██▄ ███   ██▄
-    ███    ███ ███    ███ ███   ███ ███   ███ ███▄▄▄███
-   ▄███▄▄▄██▀  ███    ███ ███   ███ ███   ███ ▀▀▀▀▀▀███
-  ▀▀███▀▀▀██▄  ███    ███ ███   ███ ███   ███ ▄██   ███
-    ███    ██▄ ███    ███ ███   ███ ███   ███ ███   ███
-    ███    ███ ███    ███ ███   ███ ███   ███ ███   ███
-   ▄█████████▀  ████████▀   ▀█   █▀   ▀█   █▀   ▀█████▀ 
-
-    ▄██████▄     ▄████████   ▄▄▄▄███▄▄▄▄      ▄████████
-    ███    ███   ███    ███ ▄██▀▀▀███▀▀▀██▄   ███    ███
-    ███    █▀    ███    ███ ███   ███   ███   ███    █▀
-   ▄███          ███    ███ ███   ███   ███  ▄███▄▄▄ 
-  ▀▀███ ████▄  ▀███████████ ███   ███   ███ ▀▀███▀▀▀  
-    ███    ███   ███    ███ ███   ███   ███   ███    █▄ 
-    ███    ███   ███    ███ ███   ███   ███   ███    ███ 
-    ████████▀    ███    █▀   ▀█   ███   █▀    ██████████
-
-
+______ _   _ _   _  _   ___   __
+| ___ \ | | | \ | || \ | \ \ / /
+| |_/ / | | |  \| ||  \| |\ V / 
+| ___ \ | | | . ` || . ` | \ /  
+| |_/ / |_| | |\  || |\  | | |  
+\____/ \___/\_| \_/\_| \_/ \_/   
+ _____   ___  ___  ___ _____    
+|  __ \ / _ \ |  \/  ||  ___|   
+| |  \// /_\ \| .  . || |__     
+| | __ |  _  || |\/| ||  __|    
+| |_\ \| | | || |  | || |___    
+ \____/\_| |_/\_|  |_/\____/ 
+*
 * Author:  Konstantin G...
 * Telegram: @bunnygame (en)
+* talk : https://bitcointalk.org/index.php?topic=5025885.0
+* discord : https://discordapp.com/invite/G2jt4Fw
 * email: info@bunnycoin.co
 * site : http://bunnycoin.co 
 */
-
-/**
-* @title Ownable
-* @dev The Ownable contract has an owner address, and provides basic authorization control
-* functions, this simplifies the implementation of "user permissions".
-*/
+ 
 contract Ownable {
     
     address ownerCEO;
     address ownerMoney;  
-     
-    address privAddress = 0x1418c3AF34FED9fDE57ae0e8Ab06C6a76476E69D; 
-    address addressAdmixture;
-    address public addressTokenBunny = 0x152903f9507ff839CEc7CF11898EF89cf5d4fcdb;
+    address privAddress = 0x23a9C3452F3f8FF71c7729624f4beCEd4A24fa55; 
+    address public addressTokenBunny = 0x2Ed020b084F7a58Ce7AC5d86496dC4ef48413a24;
     
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
@@ -80,7 +67,5 @@ contract Ownable {
     function getPrivAddress() public view onlyOwner returns(address) {
         return privAddress;
     }
-    function getAddressAdmixture() public view onlyOwner returns(address) {
-        return addressAdmixture;
-    }
+
 } 

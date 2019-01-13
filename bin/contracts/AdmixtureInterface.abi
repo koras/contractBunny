@@ -1,1 +1,0 @@
-[{"constant":true,"inputs":[{"name":"m","type":"uint256"},{"name":"w","type":"uint256"}],"name":"getAdmixture","outputs":[{"name":"procentAdmixture","type":"uint256"},{"name":"admixture","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
